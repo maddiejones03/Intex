@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container" style="padding: 2rem 2rem;">
+            <h1>Impact Dashboard</h1>
+
+            <div class="dashboard-grid">
+                <div class="card stat-card">
+                    <h3>Total Participants</h3>
+                    <p class="number">
+                        <%= participants.length * 150 %>
+                    </p> <!-- Mock multiplier -->
+                </div>
+                <div class="card stat-card">
+                    <h3>Events This Year</h3>
+                    <p class="number">
+                        <%= events.length * 12 %>
+                    </p>
+                </div>
+                <div class="card stat-card">
+                    <h3>Avg Satisfaction</h3>
+                    <p class="number">4.8/5</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h2>STEAM Interest Growth</h2>
+                <canvas id="impactChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <script>
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            const impactChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Students Interested in STEAM',
+                        data: [65, 72, 78, 85, 90, 95],
+                        borderColor: '#D84B6B',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(216, 75, 107, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        </script>
+
+        <%- include('partials/footer') %>

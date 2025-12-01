@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container" style="padding: 2rem 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Participants</h1>
+                <button class="btn btn-primary">Add Participant</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>School</th>
+                            <th>Events Attended</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% participants.forEach(function(participant) { %>
+                            <tr>
+                                <td>
+                                    <%= participant.name %>
+                                </td>
+                                <td>
+                                    <%= participant.age %>
+                                </td>
+                                <td>
+                                    <%= participant.school %>
+                                </td>
+                                <td>
+                                    <%= participant.eventsAttended %>
+                                </td>
+                                <td>
+                                    <a href="#" style="color: var(--primary-color); margin-right: 10px;">Edit</a>
+                                    <a href="#" style="color: #e74c3c;">Delete</a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

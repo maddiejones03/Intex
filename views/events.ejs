@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container" style="padding: 2rem 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Events</h1>
+                <button class="btn btn-primary">Create Event</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Attendees</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% events.forEach(function(event) { %>
+                            <tr>
+                                <td>
+                                    <%= event.name %>
+                                </td>
+                                <td>
+                                    <%= event.date %>
+                                </td>
+                                <td>
+                                    <%= event.type %>
+                                </td>
+                                <td>
+                                    <%= event.attendees %>
+                                </td>
+                                <td>
+                                    <a href="#" style="color: var(--primary-color); margin-right: 10px;">Manage</a>
+                                    <a href="#" style="color: #e74c3c;">Cancel</a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
