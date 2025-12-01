@@ -1,45 +1,103 @@
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const db = require('./db');
+
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 // Middleware
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'secret_key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Set to true if using HTTPS
+}));
 
-// Mock Data
-const participants = [
-    { id: 1, name: 'Maria Garcia', age: 16, school: 'Provo High', eventsAttended: 3 },
-    { id: 2, name: 'Sofia Rodriguez', age: 15, school: 'Timpview', eventsAttended: 1 },
-    { id: 3, name: 'Isabella Martinez', age: 17, school: 'Orem High', eventsAttended: 5 },
-];
+// Auth Middleware
+const checkAuth = (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+};
 
-const events = [
-    { id: 1, name: 'Art & Engineering Workshop', date: '2025-10-15', type: 'Workshop', attendees: 25 },
-    { id: 2, name: 'Leadership Summit', date: '2025-11-01', type: 'Seminar', attendees: 40 },
-    { id: 3, name: 'Coding for Creatives', date: '2025-12-10', type: 'Workshop', attendees: 15 },
-];
+const checkManager = (req, res, next) => {
+    if (req.session.user && req.session.user.role === 'Manager') {
+        next();
+    } else {
+        res.status(403).send('Access Denied: Managers Only');
+    }
+};
 
 // Routes
+app.get('/teapot', (req, res) => {
+    res.status(418).send("I'm a teapot");
+});
+
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Home' });
+    res.render('index', { title: 'Home', user: req.session.user });
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { title: 'Login' });
+    res.render('login', { title: 'Login', user: req.session.user });
 });
 
-app.get('/dashboard', (req, res) => {
-    res.render('dashboard', { title: 'Dashboard', participants, events });
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const user = await db('users').where({ username }).first();
+        if (user && await bcrypt.compare(password, user.password_hash)) {
+            req.session.user = { id: user.id, username: user.username, role: user.role };
+            res.redirect('/dashboard');
+        } else {
+            res.render('login', { title: 'Login', error: 'Invalid credentials', user: req.session.user });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
 });
 
-app.get('/participants', (req, res) => {
-    res.render('participants', { title: 'Participants', participants });
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
 });
 
-app.get('/events', (req, res) => {
-    res.render('events', { title: 'Events', events });
+app.get('/dashboard', checkManager, async (req, res) => {
+    try {
+        const participants = await db('participants').select('*');
+        const events = await db('events').select('*');
+        res.render('dashboard', { title: 'Dashboard', participants, events, user: req.session.user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.get('/participants', checkManager, async (req, res) => {
+    try {
+        const participants = await db('participants').select('*');
+        res.render('participants', { title: 'Participants', participants, user: req.session.user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.get('/events', async (req, res) => {
+    try {
+        const events = await db('events').select('*');
+        res.render('events', { title: 'Events', events, user: req.session.user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
 });
 
 app.listen(port, () => {

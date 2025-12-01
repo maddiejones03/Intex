@@ -1,15 +1,18 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
 
-        <div class="container" style="padding: 2rem 2rem;">
-            <h1>Impact Dashboard</h1>
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>Dashboard</h1>
+                <span style="color: var(--text-secondary);">Welcome, <%= user.username %></span>
+            </div>
 
             <div class="dashboard-grid">
                 <div class="card stat-card">
                     <h3>Total Participants</h3>
                     <p class="number">
                         <%= participants.length * 150 %>
-                    </p> <!-- Mock multiplier -->
+                    </p>
                 </div>
                 <div class="card stat-card">
                     <h3>Events This Year</h3>
@@ -23,32 +26,58 @@
                 </div>
             </div>
 
-            <div class="card" style="margin-top: 2rem;">
-                <h2>STEAM Interest Growth</h2>
-                <canvas id="impactChart" height="100"></canvas>
+            <div class="grid" style="grid-template-columns: 2fr 1fr;">
+                <div class="card">
+                    <h2>STEAM Interest Growth</h2>
+                    <canvas id="impactChart" height="150"></canvas>
+                </div>
+                <div class="card">
+                    <h2>Quick Actions</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                        <a href="/participants" class="btn btn-outline" style="text-align: center;">Manage
+                            Participants</a>
+                        <a href="/events" class="btn btn-outline" style="text-align: center;">Manage Events</a>
+                        <a href="#" class="btn btn-outline" style="text-align: center;">View Reports</a>
+                    </div>
+                </div>
             </div>
         </div>
 
         <script>
             const ctx = document.getElementById('impactChart').getContext('2d');
+            Chart.defaults.color = '#999999';
+            Chart.defaults.borderColor = '#333333';
+
             const impactChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                     datasets: [{
-                        label: 'Students Interested in STEAM',
+                        label: 'Students Interested',
                         data: [65, 72, 78, 85, 90, 95],
-                        borderColor: '#D84B6B',
+                        borderColor: '#FFFFFF',
                         tension: 0.4,
                         fill: true,
-                        backgroundColor: 'rgba(216, 75, 107, 0.1)'
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)'
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'top',
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: {
+                                color: '#333333'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
                         }
                     }
                 }

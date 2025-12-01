@@ -1,32 +1,35 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
 
-        <section class="hero">
-            <div class="container">
-                <h1>Empowering Latina Youth</h1>
-                <p>Inspiring the rising generation of women to pursue higher education and embrace their heritage
-                    through STEAM and the arts.</p>
-                <a href="/dashboard" class="btn btn-primary">View Impact Dashboard</a>
-                <a href="#" class="btn btn-outline">Learn More</a>
+        <div class="container section">
+            <div style="margin-top: 4rem; margin-bottom: 6rem;">
+                <h1>Empowering Latina<br>Youth Through<br>STEAM Education.</h1>
+                <p style="font-size: 1.2rem; max-width: 600px; margin-top: 2rem;">
+                    Ella Rises provides workshops, mentorship, and resources to help young women discover their
+                    potential in Science, Technology, Engineering, Arts, and Math.
+                </p>
+                <div style="margin-top: 3rem;">
+                    <a href="/events" class="btn btn-primary">View Events</a>
+                    <a href="/login" class="btn btn-outline" style="margin-left: 1rem;">Partner With Us</a>
+                </div>
             </div>
-        </section>
 
-        <section class="container" style="padding: 4rem 2rem; text-align: center;">
-            <h2 style="margin-bottom: 2rem;">Our Impact</h2>
-            <div class="dashboard-grid">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
                 <div class="card">
-                    <h3>Participants Served</h3>
-                    <p class="number">1,200+</p>
+                    <h3>Our Mission</h3>
+                    <p>To inspire confidence and leadership in Latina youth through hands-on learning and cultural
+                        pride.</p>
                 </div>
                 <div class="card">
-                    <h3>Workshops Held</h3>
-                    <p class="number">45</p>
+                    <h3>Our Impact</h3>
+                    <p>Over 500 students served across Utah county with 95% reporting increased interest in higher
+                        education.</p>
                 </div>
                 <div class="card">
-                    <h3>College Acceptance</h3>
-                    <p class="number">98%</p>
+                    <h3>Get Involved</h3>
+                    <p>Join us as a mentor, volunteer, or donor to help shape the next generation of leaders.</p>
                 </div>
             </div>
-        </section>
+        </div>
 
         <%- include('partials/footer') %>
