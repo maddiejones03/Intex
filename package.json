@@ -1,0 +1,20 @@
+{
+  "name": "intex",
+  "version": "1.0.0",
+  "description": "This is 4-7 Intex project.",
+  "homepage": "https://github.com/maddiejones03/Intex#readme",
+  "bugs": {
+    "url": "https://github.com/maddiejones03/Intex/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maddiejones03/Intex.git"
+  },
+  "license": "ISC",
+  "author": "Maddie Jones, Gavin Harris, Alec Neish, Natalie Castro",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
