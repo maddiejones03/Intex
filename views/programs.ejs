@@ -1,0 +1,183 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <h1>Our Programs</h1>
+                <p style="max-width: 600px; margin: 0 auto; margin-top: 1rem;">
+                    Ella Rises offers a variety of programs designed to inspire confidence, leadership, and cultural
+                    pride in young women.
+                </p>
+            </div>
+        </div>
+
+        <!-- Marquee Container -->
+        <div class="marquee-container">
+            <div class="marquee-track">
+                <!-- Original Set -->
+                <!-- Program 1: Ballet Folklorico -->
+                <div class="program-card">
+                    <img src="/images/programs/balletfolklorico.png" alt="Ballet Folklorico"
+                        style="object-position: top;">
+                    <div class="content">
+                        <h3>Ballet Folklorico</h3>
+                        <p>Girls ages 11-18 years old<br>Mondays at 7pm
+                            <br>Auditions for 2026 begin in May
+                        </p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+
+                <!-- Program 2: Mariachi -->
+                <div class="program-card">
+                    <img src="/images/programs/mariachi.png" alt="Mariachi">
+                    <div class="content">
+                        <h3>Mariachi</h3>
+                        <p>Girls ages 11-18<br>
+                            Music class for: violin, trumpet, guitarrón, vihuela, and guitar<br>
+                            Mondays from 5:30pm - 6:45pm<br>
+                            Annual program fee: $45 (venmo or cash)</p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+
+                <!-- Program 3: STEAM -->
+                <div class="program-card">
+                    <img src="/images/programs/steam.png" alt="STEAM">
+                    <div class="content">
+                        <h3>STEAM</h3>
+                        <p>Science, Technology, Engineering, Arts, and Math workshops to inspire innovation.</p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+
+                <!-- Program 4: Summit + Educational Pathways -->
+                <div class="program-card">
+                    <img src="/images/programs/summit.png" alt="Summit + Educational Pathways">
+                    <div class="content">
+                        <h3>Summit + Educational Pathways</h3>
+                        <p>Guiding young women towards higher education and career success.</p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+
+                <!-- Duplicated Set for Seamless Loop -->
+                <!-- Program 1: Ballet Folklorico -->
+                <div class="program-card">
+                    <img src="/images/programs/balletfolklorico.png" alt="Ballet Folklorico"
+                        style="object-position: top;">
+                    <div class="content">
+                        <h3>Ballet Folklorico</h3>
+                        <p>Girls ages 11-18 years old<br>Mondays at 7pm
+                            <br>Auditions for 2026 begin in May
+                        </p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+
+                <!-- Program 2: Mariachi -->
+                <div class="program-card">
+                    <img src="/images/programs/mariachi.png" alt="Mariachi">
+                    <div class="content">
+                        <h3>Mariachi</h3>
+                        <p>Girls ages 11-18<br>
+                            Music class for: violin, trumpet, guitarrón, vihuela, and guitar<br>
+                            Mondays from 5:30pm - 6:45pm<br>
+                            Annual program fee: $45 (venmo or cash)</p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+
+                <!-- Program 3: STEAM -->
+                <div class="program-card">
+                    <img src="/images/programs/steam.png" alt="STEAM">
+                    <div class="content">
+                        <h3>STEAM</h3>
+                        <p>Science, Technology, Engineering, Arts, and Math workshops to inspire innovation.</p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+
+                <!-- Program 4: Summit + Educational Pathways -->
+                <div class="program-card">
+                    <img src="/images/programs/summit.png" alt="Summit + Educational Pathways">
+                    <div class="content">
+                        <h3>Summit + Educational Pathways</h3>
+                        <p>Guiding young women towards higher education and career success.</p>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .marquee-container {
+                width: 100%;
+                overflow: hidden;
+                white-space: nowrap;
+                position: relative;
+            }
+
+            .marquee-track {
+                display: flex;
+                gap: 2rem;
+                width: max-content;
+                animation: scroll 40s linear infinite;
+            }
+
+            .marquee-track:hover {
+                animation-play-state: paused;
+            }
+
+            @keyframes scroll {
+                0% {
+                    transform: translateX(0);
+                }
+
+                100% {
+                    transform: translateX(calc(-50% - 1rem));
+                    /* Move by half the width (one full set) plus half the gap */
+                }
+            }
+
+            .program-card {
+                flex: 0 0 auto;
+                width: 400px;
+                background: white;
+                border-radius: 200px 200px 16px 16px;
+                /* Arch shape - half of width */
+                border: 8px solid white;
+                /* White arch border */
+                box-shadow: var(--shadow);
+                overflow: hidden;
+                transition: transform 0.3s ease;
+                white-space: normal;
+                /* Reset text wrapping inside card */
+            }
+
+            .program-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .program-card img {
+                width: 100%;
+                height: 400px;
+                object-fit: cover;
+                /* Ensure photos fit the box */
+                display: block;
+                /* Remove bottom space */
+            }
+
+            .program-card .content {
+                padding: 2rem;
+                text-align: center;
+                /* Center text for better look with arch */
+            }
+
+            .program-card h3 {
+                margin-bottom: 1rem;
+                color: var(--primary);
+                font-family: var(--font-heading);
+            }
+        </style>
+
+        <%- include('partials/footer') %>

@@ -1,0 +1,121 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>Surveys</h1>
+                <% if (user && user.role==='Manager' ) { %>
+                    <button onclick="document.getElementById('addSurveyModal').style.display='block'"
+                        class="btn btn-primary">Add Survey</button>
+                    <% } %>
+            </div>
+
+            <form action="/surveys" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" placeholder="Search by topic..."
+                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
+                <button type="submit" class="btn btn-outline">Search</button>
+                <% if (typeof search !=='undefined' && search) { %>
+                    <a href="/surveys" class="btn btn-outline">Clear</a>
+                    <% } %>
+            </form>
+
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Topic</th>
+                            <th>Question</th>
+                            <th>Responses</th>
+                            <% if (user && user.role==='Manager' ) { %>
+                                <th>Actions</th>
+                                <% } %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% surveys.forEach(s=> { %>
+                            <tr>
+                                <td>
+                                    <%= s.topic %>
+                                </td>
+                                <td>
+                                    <%= s.question %>
+                                </td>
+                                <td>
+                                    <%= JSON.parse(s.responses).length %>
+                                </td>
+                                <% if (user && user.role==='Manager' ) { %>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button
+                                                onclick="editSurvey('<%= s.id %>', '<%= s.topic %>', '<%= s.question %>')"
+                                                class="btn btn-outline"
+                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
+                                            <form action="/surveys/delete/<%= s.id %>" method="POST"
+                                                onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                                <button type="submit" class="btn btn-primary"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <% } %>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <% if (user && user.role==='Manager' ) { %>
+            <!-- Add Survey Modal -->
+            <div id="addSurveyModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+                <div class="form-container" style="margin: 10vh auto; position: relative;">
+                    <span onclick="document.getElementById('addSurveyModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Add Survey</h2>
+                    <form action="/surveys/add" method="POST">
+                        <div class="form-group">
+                            <label for="topic">Topic</label>
+                            <input type="text" name="topic" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="question">Question</label>
+                            <input type="text" name="question" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Survey</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Survey Modal -->
+            <div id="editSurveyModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+                <div class="form-container" style="margin: 10vh auto; position: relative;">
+                    <span onclick="document.getElementById('editSurveyModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Survey</h2>
+                    <form id="editSurveyForm" action="" method="POST">
+                        <div class="form-group">
+                            <label for="edit_topic">Topic</label>
+                            <input type="text" id="edit_topic" name="topic" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_question">Question</label>
+                            <input type="text" id="edit_question" name="question" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Survey</button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                function editSurvey(id, topic, question) {
+                    document.getElementById('editSurveyForm').action = '/surveys/edit/' + id;
+                    document.getElementById('edit_topic').value = topic;
+                    document.getElementById('edit_question').value = question;
+                    document.getElementById('editSurveyModal').style.display = 'block';
+                }
+            </script>
+            <% } %>
+
+                <%- include('partials/footer') %>

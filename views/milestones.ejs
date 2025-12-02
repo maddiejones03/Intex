@@ -1,0 +1,132 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>Milestones</h1>
+                <% if (user && user.role==='Manager' ) { %>
+                    <button onclick="document.getElementById('addMilestoneModal').style.display='block'"
+                        class="btn btn-primary">Add Milestone</button>
+                    <% } %>
+            </div>
+
+            <form action="/milestones" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" placeholder="Search by name..."
+                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
+                <button type="submit" class="btn btn-outline">Search</button>
+                <% if (typeof search !=='undefined' && search) { %>
+                    <a href="/milestones" class="btn btn-outline">Clear</a>
+                    <% } %>
+            </form>
+
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <% if (user && user.role==='Manager' ) { %>
+                                <th>Actions</th>
+                                <% } %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% milestones.forEach(m=> { %>
+                            <tr>
+                                <td>
+                                    <%= m.name %>
+                                </td>
+                                <td>
+                                    <%= m.description %>
+                                </td>
+                                <td>
+                                    <%= new Date(m.date).toLocaleDateString() %>
+                                </td>
+                                <% if (user && user.role==='Manager' ) { %>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button
+                                                onclick="editMilestone('<%= m.id %>', '<%= m.name %>', '<%= m.description %>', '<%= m.date %>')"
+                                                class="btn btn-outline"
+                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
+                                            <form action="/milestones/delete/<%= m.id %>" method="POST"
+                                                onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                                <button type="submit" class="btn btn-primary"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <% } %>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <% if (user && user.role==='Manager' ) { %>
+            <!-- Add Milestone Modal -->
+            <div id="addMilestoneModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+                <div class="form-container" style="margin: 10vh auto; position: relative;">
+                    <span onclick="document.getElementById('addMilestoneModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Add Milestone</h2>
+                    <form action="/milestones/add" method="POST">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="text" name="description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" name="date" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Milestone</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Milestone Modal -->
+            <div id="editMilestoneModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+                <div class="form-container" style="margin: 10vh auto; position: relative;">
+                    <span onclick="document.getElementById('editMilestoneModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Milestone</h2>
+                    <form id="editMilestoneForm" action="" method="POST">
+                        <div class="form-group">
+                            <label for="edit_name">Name</label>
+                            <input type="text" id="edit_name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_description">Description</label>
+                            <input type="text" id="edit_description" name="description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_date">Date</label>
+                            <input type="date" id="edit_date" name="date" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Milestone</button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                function editMilestone(id, name, description, date) {
+                    document.getElementById('editMilestoneForm').action = '/milestones/edit/' + id;
+                    document.getElementById('edit_name').value = name;
+                    document.getElementById('edit_description').value = description;
+                    const d = new Date(date);
+                    const dateString = d.toISOString().split('T')[0];
+                    document.getElementById('edit_date').value = dateString;
+                    document.getElementById('editMilestoneModal').style.display = 'block';
+                }
+            </script>
+            <% } %>
+
+                <%- include('partials/footer') %>

@@ -1,0 +1,119 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>User Management</h1>
+                <button onclick="document.getElementById('addUserModal').style.display='block'"
+                    class="btn btn-primary">Add New User</button>
+            </div>
+
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(u=> { %>
+                            <tr>
+                                <td>
+                                    <%= u.id %>
+                                </td>
+                                <td>
+                                    <%= u.username %>
+                                </td>
+                                <td>
+                                    <%= u.role %>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button onclick="editUser('<%= u.id %>', '<%= u.username %>', '<%= u.role %>')"
+                                            class="btn btn-outline"
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
+                                        <form action="/users/delete/<%= u.id %>" method="POST"
+                                            onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                            <button type="submit" class="btn btn-primary"
+                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add User Modal -->
+        <div id="addUserModal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+            <div class="form-container" style="margin: 10vh auto; position: relative;">
+                <span onclick="document.getElementById('addUserModal').style.display='none'"
+                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 style="text-align: center; margin-bottom: 2rem;">Add User</h2>
+                <form action="/users/add" method="POST">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select name="role"
+                            style="width: 100%; padding: 0.8rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px;">
+                            <option value="User">User</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create User</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit User Modal -->
+        <div id="editUserModal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+            <div class="form-container" style="margin: 10vh auto; position: relative;">
+                <span onclick="document.getElementById('editUserModal').style.display='none'"
+                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 style="text-align: center; margin-bottom: 2rem;">Edit User</h2>
+                <form id="editUserForm" action="" method="POST">
+                    <div class="form-group">
+                        <label for="edit_username">Username</label>
+                        <input type="text" id="edit_username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_password">New Password (leave blank to keep)</label>
+                        <input type="password" name="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_role">Role</label>
+                        <select id="edit_role" name="role"
+                            style="width: 100%; padding: 0.8rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px;">
+                            <option value="User">User</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Update User</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function editUser(id, username, role) {
+                document.getElementById('editUserForm').action = '/users/edit/' + id;
+                document.getElementById('edit_username').value = username;
+                document.getElementById('edit_role').value = role;
+                document.getElementById('editUserModal').style.display = 'block';
+            }
+        </script>
+
+        <%- include('partials/footer') %>

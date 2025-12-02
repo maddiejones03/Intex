@@ -1,15 +1,21 @@
 /* Reset & Base */
 :root {
-    --bg-color: #ffd9d2;
-    --surface-color: #111111;
-    --text-primary: #000000;
-    --text-secondary: #999999;
-    --accent-color: #FFFFFF;
-    --border-color: #333333;
-    --font-main: 'Inter', sans-serif;
+    --bg-color: #F9F5EA;
+    --surface-color: #FFFFFF;
+    --text-primary: #3A3F3B;
+    --text-secondary: #5A5F5B;
+    --accent-color: #CE325B;
+    /* Dark Pink */
+    --accent-blue: #99B7C6;
+    --accent-green: #9AB59D;
+    --accent-peach: #F4B092;
+    --border-color: #E0E0E0;
+    --font-heading: 'DM Serif Display', serif;
+    --font-body: 'Montserrat', sans-serif;
     --spacing-unit: 1rem;
     --container-width: 1200px;
-    --border-radius: 12px;
+    --border-radius: 16px;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -21,7 +27,7 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-primary);
-    font-family: var(--font-main);
+    font-family: var(--font-body);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
 }
@@ -41,10 +47,17 @@ ul {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 500;
-    letter-spacing: -0.02em;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: 0.02em;
     margin-bottom: 1rem;
+    color: var(--text-primary);
 }
 
 h1 {
@@ -89,18 +102,20 @@ p {
 /* Components */
 .btn {
     display: inline-block;
-    padding: 0.8rem 1.5rem;
+    padding: 0.8rem 2rem;
     border-radius: 50px;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 1px solid transparent;
+    border: 2px solid transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .btn-primary {
     background-color: var(--accent-color);
-    color: var(--bg-color);
+    color: #FFFFFF;
 }
 
 .btn-primary:hover {
@@ -111,24 +126,27 @@ p {
 
 .btn-outline {
     background-color: transparent;
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--text-primary);
     color: var(--text-primary);
 }
 
 .btn-outline:hover {
-    border-color: var(--accent-color);
+    background-color: var(--text-primary);
+    color: #FFFFFF;
 }
 
 .card {
     background-color: var(--surface-color);
-    padding: 2rem;
+    padding: 2.5rem;
     border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    transition: transform 0.3s ease;
+    box-shadow: var(--shadow);
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Navigation */
@@ -138,10 +156,11 @@ header {
     left: 0;
     width: 100%;
     z-index: 1000;
-    padding: 1.5rem 0;
-    background: rgba(6, 6, 6, 0.8);
+    padding: 1rem 0;
+    background: rgba(249, 245, 234, 0.95);
+    /* Matches bg-color with opacity */
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 nav {
@@ -150,10 +169,23 @@ nav {
     align-items: center;
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo img {
+    height: 80px;
+    width: auto;
+}
+
 .logo span {
-    font-size: 1.2rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    color: #3A3F3B;
+    /* Using the pink accent for the brand name */
+    font-weight: 400;
 }
 
 .nav-links {
@@ -164,21 +196,68 @@ nav {
 
 .nav-links a {
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-.nav-links a:hover, .nav-links a.active {
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--accent-color);
+}
+
+/* Dropdown Styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--surface-color);
+    min-width: 160px;
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 0;
+}
+
+.dropdown-content a {
     color: var(--text-primary);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-transform: none;
+    /* Keep dropdown items normal case or as desired */
+    font-size: 0.9rem;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    color: var(--accent-color);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    color: var(--accent-color);
 }
 
 /* Forms */
 .form-container {
-    max-width: 400px;
+    max-width: 500px;
     margin: 8rem auto;
     padding: 3rem;
     background-color: var(--surface-color);
     border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
 }
 
 .form-group {
@@ -189,23 +268,28 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-input {
+input,
+select {
     width: 100%;
-    padding: 0.8rem;
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
+    padding: 1rem;
+    background-color: #F5F5F5;
+    border: 1px solid transparent;
     border-radius: 8px;
     color: var(--text-primary);
-    font-family: var(--font-main);
+    font-family: var(--font-body);
     outline: none;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-input:focus {
+input:focus,
+select:focus {
+    background-color: #FFFFFF;
     border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(206, 50, 91, 0.1);
 }
 
 /* Dashboard */
@@ -217,15 +301,17 @@ input:focus {
 }
 
 .stat-card h3 {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
+    font-family: var(--font-body);
 }
 
 .stat-card .number {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 3rem;
+    font-weight: 400;
+    color: var(--accent-color);
+    font-family: var(--font-heading);
 }
 
 table {
@@ -234,16 +320,23 @@ table {
     margin-top: 1rem;
 }
 
-th, td {
+th,
+td {
     text-align: left;
-    padding: 1rem;
+    padding: 1.2rem;
     border-bottom: 1px solid var(--border-color);
 }
 
 th {
     color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+tr:last-child td {
+    border-bottom: none;
 }
 
 /* Footer */
@@ -254,4 +347,15 @@ footer {
     text-align: center;
     color: var(--text-secondary);
     font-size: 0.9rem;
+}
+
+.social-links a {
+    color: var(--text-secondary);
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: inline-block;
+}
+
+.social-links a:hover {
+    color: var(--accent-color);
+    transform: translateY(-3px);
 }

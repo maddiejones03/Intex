@@ -1,44 +1,69 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
 
-        <div class="container" style="padding: 2rem 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <h1>Events</h1>
-                <button class="btn btn-primary">Create Event</button>
+                <% if (user && user.role==='Manager' ) { %>
+                    <button onclick="document.getElementById('addEventModal').style.display='block'"
+                        class="btn btn-primary">Add Event</button>
+                    <% } %>
             </div>
 
-            <div class="table-container">
+            <form action="/events" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" placeholder="Search by name or type..."
+                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
+                <button type="submit" class="btn btn-outline">Search</button>
+                <% if (typeof search !=='undefined' && search) { %>
+                    <a href="/events" class="btn btn-outline">Clear</a>
+                    <% } %>
+            </form>
+
+            <div class="card">
                 <table>
                     <thead>
                         <tr>
-                            <th>Event Name</th>
+                            <th>Name</th>
                             <th>Date</th>
                             <th>Type</th>
                             <th>Attendees</th>
-                            <th>Actions</th>
+                            <% if (user && user.role==='Manager' ) { %>
+                                <th>Actions</th>
+                                <% } %>
                         </tr>
                     </thead>
                     <tbody>
-                        <% events.forEach(function(event) { %>
+                        <% events.forEach(e=> { %>
                             <tr>
                                 <td>
-                                    <%= event.name %>
+                                    <%= e.name %>
                                 </td>
                                 <td>
-                                    <%= event.date %>
+                                    <%= new Date(e.date).toLocaleDateString() %>
                                 </td>
                                 <td>
-                                    <%= event.type %>
+                                    <%= e.type %>
                                 </td>
                                 <td>
-                                    <%= event.attendees %>
+                                    <%= e.attendees %>
                                 </td>
-                                <td>
-                                    <a href="#" style="color: var(--primary-color); margin-right: 10px;">Manage</a>
-                                    <a href="#" style="color: #e74c3c;">Cancel</a>
-                                </td>
+                                <% if (user && user.role==='Manager' ) { %>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button
+                                                onclick="editEvent('<%= e.id %>', '<%= e.name %>', '<%= e.date %>', '<%= e.type %>', '<%= e.attendees %>')"
+                                                class="btn btn-outline"
+                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
+                                            <form action="/events/delete/<%= e.id %>" method="POST"
+                                                onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                                <button type="submit" class="btn btn-primary"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <% } %>
                             </tr>
-                            <% }); %>
+                            <% }) %>
                     </tbody>
                 </table>
             </div>

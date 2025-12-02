@@ -1,13 +1,25 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
 
-        <div class="container" style="padding: 2rem 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <h1>Participants</h1>
-                <button class="btn btn-primary">Add Participant</button>
+                <% if (user && user.role==='Manager' ) { %>
+                    <button onclick="document.getElementById('addParticipantModal').style.display='block'"
+                        class="btn btn-primary">Add Participant</button>
+                    <% } %>
             </div>
 
-            <div class="table-container">
+            <form action="/participants" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" placeholder="Search by name or school..."
+                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
+                <button type="submit" class="btn btn-outline">Search</button>
+                <% if (typeof search !=='undefined' && search) { %>
+                    <a href="/participants" class="btn btn-outline">Clear</a>
+                    <% } %>
+            </form>
+
+            <div class="card">
                 <table>
                     <thead>
                         <tr>
@@ -15,32 +27,42 @@
                             <th>Age</th>
                             <th>School</th>
                             <th>Events Attended</th>
-                            <th>Actions</th>
+                            <% if (user && user.role==='Manager' ) { %>
+                                <th>Actions</th>
+                                <% } %>
                         </tr>
                     </thead>
                     <tbody>
-                        <% participants.forEach(function(participant) { %>
+                        <% participants.forEach(p=> { %>
                             <tr>
                                 <td>
-                                    <%= participant.name %>
+                                    <%= p.name %>
                                 </td>
                                 <td>
-                                    <%= participant.age %>
+                                    <%= p.age %>
                                 </td>
                                 <td>
-                                    <%= participant.school %>
+                                    <%= p.school %>
                                 </td>
                                 <td>
-                                    <%= participant.eventsAttended %>
+                                    <%= p.eventsAttended %>
                                 </td>
-                                <td>
-                                    <a href="#" style="color: var(--primary-color); margin-right: 10px;">Edit</a>
-                                    <a href="#" style="color: #e74c3c;">Delete</a>
-                                </td>
+                                <% if (user && user.role==='Manager' ) { %>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button
+                                                onclick="editParticipant('<%= p.id %>', '<%= p.name %>', '<%= p.age %>', '<%= p.school %>', '<%= p.eventsAttended %>')"
+                                                class="btn btn-outline"
+                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
+                                            <form action="/participants/delete/<%= p.id %>" method="POST"
+                                                onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                                <button type="submit" class="btn btn-primary"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <% } %>
                             </tr>
-                            <% }); %>
-                    </tbody>
-                </table>
             </div>
         </div>
 

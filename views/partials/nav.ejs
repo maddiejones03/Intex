@@ -2,18 +2,44 @@
     <div class="container">
         <nav>
             <a href="/" class="logo">
+                <img src="/images/logonobg.png" alt="Ella Rises">
                 <span>Ella Rises</span>
             </a>
             <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/events">Events</a>
+                <a href="/about"
+                    class="<%= typeof title !== 'undefined' && title === 'About Us' ? 'active' : '' %>">About</a>
+                <a href="/programs"
+                    class="<%= typeof title !== 'undefined' && title === 'Programs' ? 'active' : '' %>">Programs</a>
+                <a href="/donate">Donate</a>
+
                 <% if (typeof user !=='undefined' && user) { %>
+                    <!-- Logged In Users -->
+                    <div class="dropdown">
+                        <a href="#" class="dropbtn">Records ▾</a>
+                        <div class="dropdown-content">
+                            <a href="/events">Events</a>
+                            <a href="/participants">Participants</a>
+                            <a href="/surveys">Surveys</a>
+                            <a href="/milestones">Milestones</a>
+                            <a href="/donations">Donations</a>
+                        </div>
+                    </div>
+
                     <% if (user.role==='Manager' ) { %>
-                        <a href="/dashboard">Dashboard</a>
-                        <a href="/participants">Participants</a>
+                        <!-- Manager Only -->
+                        <div class="dropdown">
+                            <a href="#" class="dropbtn">Admin ▾</a>
+                            <div class="dropdown-content">
+                                <a href="/dashboard">Dashboard</a>
+                                <a href="/users">Users</a>
+                            </div>
+                        </div>
                         <% } %>
+
                             <a href="/logout" class="btn btn-primary">Logout</a>
                             <% } else { %>
+                                <!-- Visitor -->
                                 <a href="/login" class="btn btn-primary">Login</a>
                                 <% } %>
             </div>
