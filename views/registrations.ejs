@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container section" style="margin-top: 4rem;">
+            <h1>Event Registrations</h1>
+
+            <!-- Search Form -->
+            <form action="/registrations" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" placeholder="Search by participant or event..."
+                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
+                <button type="submit" class="btn btn-outline">Search</button>
+                <% if (typeof search !=='undefined' && search) { %>
+                    <a href="/registrations" class="btn btn-outline">Clear</a>
+                    <% } %>
+            </form>
+
+            <div class="card">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                            <th style="padding: 1rem;">ID</th>
+                            <th style="padding: 1rem;">Participant</th>
+                            <th style="padding: 1rem;">Event</th>
+                            <th style="padding: 1rem;">Date</th>
+                            <th style="padding: 1rem;">Status</th>
+                            <th style="padding: 1rem;">Registered On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% registrations.forEach(r=> { %>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 1rem;">
+                                    <%= r.registrationid %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= r.participantfirstname %>
+                                        <%= r.participantlastname %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= r.eventname %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= new Date(r.eventdatetimestart).toLocaleString() %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= r.registrationstatus %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= new Date(r.registrationcreatedat).toLocaleDateString() %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

@@ -3,15 +3,15 @@
 
         <div class="container section" style="margin-top: 4rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1>Surveys</h1>
+                <h1>Survey Submissions</h1>
                 <% if (user && user.role==='Manager' ) { %>
-                    <button onclick="document.getElementById('addSurveyModal').style.display='block'"
-                        class="btn btn-primary">Add Survey</button>
+                    <button onclick="openModal()" class="btn btn-primary">Add Submission</button>
                     <% } %>
             </div>
 
+            <!-- Search Form -->
             <form action="/surveys" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" placeholder="Search by topic..."
+                <input type="text" name="search" placeholder="Search by participant name..."
                     value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
                 <button type="submit" class="btn btn-outline">Search</button>
                 <% if (typeof search !=='undefined' && search) { %>
@@ -19,38 +19,50 @@
                     <% } %>
             </form>
 
+            <!-- Surveys Table -->
             <div class="card">
-                <table>
+                <table style="width: 100%; border-collapse: collapse;">
                     <thead>
-                        <tr>
-                            <th>Topic</th>
-                            <th>Question</th>
-                            <th>Responses</th>
+                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                            <th style="padding: 1rem;">ID</th>
+                            <th style="padding: 1rem;">Participant</th>
+                            <th style="padding: 1rem;">Satisfaction</th>
+                            <th style="padding: 1rem;">Overall</th>
+                            <th style="padding: 1rem;">Date</th>
                             <% if (user && user.role==='Manager' ) { %>
-                                <th>Actions</th>
+                                <th style="padding: 1rem;">Actions</th>
                                 <% } %>
                         </tr>
                     </thead>
                     <tbody>
                         <% surveys.forEach(s=> { %>
-                            <tr>
-                                <td>
-                                    <%= s.topic %>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 1rem;">
+                                    <%= s.surveyid %>
                                 </td>
-                                <td>
-                                    <%= s.question %>
+                                <td style="padding: 1rem;">
+                                    <% if (s.participantfirstname) { %>
+                                        <%= s.participantfirstname %>
+                                            <%= s.participantlastname %>
+                                                <% } else { %>
+                                                    <em>Anonymous/Unlinked</em>
+                                                    <% } %>
                                 </td>
-                                <td>
-                                    <%= JSON.parse(s.responses).length %>
+                                <td style="padding: 1rem;">
+                                    <%= s.surveysatisfactionscore %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= s.surveyoverallscore %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= new Date(s.surveysubmissiondate).toLocaleDateString() %>
                                 </td>
                                 <% if (user && user.role==='Manager' ) { %>
-                                    <td>
+                                    <td style="padding: 1rem;">
                                         <div style="display: flex; gap: 0.5rem;">
-                                            <button
-                                                onclick="editSurvey('<%= s.id %>', '<%= s.topic %>', '<%= s.question %>')"
-                                                class="btn btn-outline"
+                                            <button onclick="editSurvey('<%= s.surveyid %>')" class="btn btn-outline"
                                                 style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
-                                            <form action="/surveys/delete/<%= s.id %>" method="POST"
+                                            <form action="/surveys/delete/<%= s.surveyid %>" method="POST"
                                                 onsubmit="return confirm('Are you sure?');" style="display: inline;">
                                                 <button type="submit" class="btn btn-primary"
                                                     style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
@@ -59,63 +71,124 @@
                                     </td>
                                     <% } %>
                             </tr>
-                            <% }); %>
+                            <% }) %>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <% if (user && user.role==='Manager' ) { %>
-            <!-- Add Survey Modal -->
-            <div id="addSurveyModal"
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
-                <div class="form-container" style="margin: 10vh auto; position: relative;">
-                    <span onclick="document.getElementById('addSurveyModal').style.display='none'"
-                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                    <h2 style="text-align: center; margin-bottom: 2rem;">Add Survey</h2>
-                    <form action="/surveys/add" method="POST">
+        <!-- Add/Edit Modal -->
+        <div id="surveyModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div class="modal-content"
+                style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 600px; border-radius: 8px; position: relative; max-height: 90vh; overflow-y: auto;">
+                <span onclick="closeModal()"
+                    style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Add Submission</h2>
+                <form id="surveyForm" action="/surveys/add" method="POST">
+                    <div class="form-group">
+                        <label>Participant</label>
+                        <select name="participantid" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="">-- Select Participant (Optional) --</option>
+                            <% participants.forEach(p=> { %>
+                                <option value="<%= p.participantid %>">
+                                    <%= p.participantfirstname %>
+                                        <%= p.participantlastname %>
+                                </option>
+                                <% }) %>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                         <div class="form-group">
-                            <label for="topic">Topic</label>
-                            <input type="text" name="topic" required>
+                            <label>Satisfaction (1-10)</label>
+                            <input type="number" name="surveysatisfactionscore" min="1" max="10"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
                         <div class="form-group">
-                            <label for="question">Question</label>
-                            <input type="text" name="question" required>
+                            <label>Usefulness (1-10)</label>
+                            <input type="number" name="surveyusefulnessscore" min="1" max="10"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Survey</button>
-                    </form>
-                </div>
+                        <div class="form-group">
+                            <label>Instructor (1-10)</label>
+                            <input type="number" name="surveyinstructorscore" min="1" max="10"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Recommendation (1-10)</label>
+                            <input type="number" name="surveyrecommendationscore" min="1" max="10"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Overall (1-10)</label>
+                            <input type="number" name="surveyoverallscore" min="1" max="10"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>NPS Bucket</label>
+                            <select name="surveynpsbucket" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                                <option value="Promoter">Promoter</option>
+                                <option value="Passive">Passive</option>
+                                <option value="Detractor">Detractor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Date</label>
+                        <input type="date" name="surveysubmissiondate" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Comments</label>
+                        <textarea name="surveycomments" rows="3"
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Save</button>
+                </form>
             </div>
+        </div>
 
-            <!-- Edit Survey Modal -->
-            <div id="editSurveyModal"
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
-                <div class="form-container" style="margin: 10vh auto; position: relative;">
-                    <span onclick="document.getElementById('editSurveyModal').style.display='none'"
-                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Survey</h2>
-                    <form id="editSurveyForm" action="" method="POST">
-                        <div class="form-group">
-                            <label for="edit_topic">Topic</label>
-                            <input type="text" id="edit_topic" name="topic" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_question">Question</label>
-                            <input type="text" id="edit_question" name="question" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Survey</button>
-                    </form>
-                </div>
-            </div>
+        <script>
+            const surveysData = <% - JSON.stringify(surveys) %>;
 
-            <script>
-                function editSurvey(id, topic, question) {
-                    document.getElementById('editSurveyForm').action = '/surveys/edit/' + id;
-                    document.getElementById('edit_topic').value = topic;
-                    document.getElementById('edit_question').value = question;
-                    document.getElementById('editSurveyModal').style.display = 'block';
+            function openModal() {
+                document.getElementById('surveyModal').style.display = 'block';
+                document.getElementById('modalTitle').innerText = 'Add Submission';
+                document.getElementById('surveyForm').action = '/surveys/add';
+                document.getElementById('surveyForm').reset();
+                document.querySelector('input[name="surveysubmissiondate"]').valueAsDate = new Date();
+            }
+
+            function closeModal() {
+                document.getElementById('surveyModal').style.display = 'none';
+            }
+
+            function editSurvey(id) {
+                const s = surveysData.find(s => s.surveyid == id);
+                if (!s) return;
+
+                document.getElementById('surveyModal').style.display = 'block';
+                document.getElementById('modalTitle').innerText = 'Edit Submission';
+                document.getElementById('surveyForm').action = `/surveys/edit/${s.surveyid}`;
+
+                const form = document.getElementById('surveyForm');
+                form.participantid.value = s.participantid || '';
+                form.surveysatisfactionscore.value = s.surveysatisfactionscore;
+                form.surveyusefulnessscore.value = s.surveyusefulnessscore;
+                form.surveyinstructorscore.value = s.surveyinstructorscore;
+                form.surveyrecommendationscore.value = s.surveyrecommendationscore;
+                form.surveyoverallscore.value = s.surveyoverallscore;
+                form.surveynpsbucket.value = s.surveynpsbucket || 'Promoter';
+                form.surveycomments.value = s.surveycomments || '';
+                form.surveysubmissiondate.value = s.surveysubmissiondate ? s.surveysubmissiondate.split('T')[0] : '';
+            }
+
+            // Close modal if clicked outside
+            window.onclick = function (event) {
+                if (event.target == document.getElementById('surveyModal')) {
+                    closeModal();
                 }
-            </script>
-            <% } %>
+            }
+        </script>
 
-                <%- include('partials/footer') %>
+        <%- include('partials/footer') %>

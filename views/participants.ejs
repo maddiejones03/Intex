@@ -5,13 +5,13 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <h1>Participants</h1>
                 <% if (user && user.role==='Manager' ) { %>
-                    <button onclick="document.getElementById('addParticipantModal').style.display='block'"
-                        class="btn btn-primary">Add Participant</button>
+                    <button onclick="openModal()" class="btn btn-primary">Add Participant</button>
                     <% } %>
             </div>
 
+            <!-- Search Form -->
             <form action="/participants" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" placeholder="Search by name or school..."
+                <input type="text" name="search" placeholder="Search by name or email..."
                     value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
                 <button type="submit" class="btn btn-outline">Search</button>
                 <% if (typeof search !=='undefined' && search) { %>
@@ -19,42 +19,47 @@
                     <% } %>
             </form>
 
+            <!-- Participants Table -->
             <div class="card">
-                <table>
+                <table style="width: 100%; border-collapse: collapse;">
                     <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Age</th>
-                            <th>School</th>
-                            <th>Events Attended</th>
+                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                            <th style="padding: 1rem;">Name</th>
+                            <th style="padding: 1rem;">Email</th>
+                            <th style="padding: 1rem;">Phone</th>
+                            <th style="padding: 1rem;">City/State</th>
+                            <th style="padding: 1rem;">DOB</th>
                             <% if (user && user.role==='Manager' ) { %>
-                                <th>Actions</th>
+                                <th style="padding: 1rem;">Actions</th>
                                 <% } %>
                         </tr>
                     </thead>
                     <tbody>
                         <% participants.forEach(p=> { %>
-                            <tr>
-                                <td>
-                                    <%= p.name %>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 1rem;">
+                                    <%= p.participantfirstname %>
+                                        <%= p.participantlastname %>
                                 </td>
-                                <td>
-                                    <%= p.age %>
+                                <td style="padding: 1rem;">
+                                    <%= p.participantemail %>
                                 </td>
-                                <td>
-                                    <%= p.school %>
+                                <td style="padding: 1rem;">
+                                    <%= p.participantphone %>
                                 </td>
-                                <td>
-                                    <%= p.eventsAttended %>
+                                <td style="padding: 1rem;">
+                                    <%= p.participantcity %>, <%= p.participantstate %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= new Date(p.participantdateofbirth).toLocaleDateString() %>
                                 </td>
                                 <% if (user && user.role==='Manager' ) { %>
-                                    <td>
+                                    <td style="padding: 1rem;">
                                         <div style="display: flex; gap: 0.5rem;">
-                                            <button
-                                                onclick="editParticipant('<%= p.id %>', '<%= p.name %>', '<%= p.age %>', '<%= p.school %>', '<%= p.eventsAttended %>')"
+                                            <button onclick="editParticipant('<%= p.participantid %>')"
                                                 class="btn btn-outline"
                                                 style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
-                                            <form action="/participants/delete/<%= p.id %>" method="POST"
+                                            <form action="/participants/delete/<%= p.participantid %>" method="POST"
                                                 onsubmit="return confirm('Are you sure?');" style="display: inline;">
                                                 <button type="submit" class="btn btn-primary"
                                                     style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
@@ -63,7 +68,123 @@
                                     </td>
                                     <% } %>
                             </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
             </div>
         </div>
+
+        <!-- Add/Edit Modal -->
+        <div id="participantModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div class="modal-content"
+                style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 800px; border-radius: 8px; position: relative; max-height: 90vh; overflow-y: auto;">
+                <span onclick="closeModal()"
+                    style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Add Participant</h2>
+                <form id="participantForm" action="/participants/add" method="POST">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="participantfirstname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="participantlastname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="participantemail" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" name="participantphone"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" name="participantaddress"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" name="participantcity"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" name="participantstate"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Zip</label>
+                            <input type="text" name="participantzip"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" name="participantdateofbirth"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select name="participantgender" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                                <option value="">Select...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const participantsData = <% - JSON.stringify(participants) %>;
+
+            function openModal() {
+                document.getElementById('participantModal').style.display = 'block';
+                document.getElementById('modalTitle').innerText = 'Add Participant';
+                document.getElementById('participantForm').action = '/participants/add';
+                document.getElementById('participantForm').reset();
+            }
+
+            function closeModal() {
+                document.getElementById('participantModal').style.display = 'none';
+            }
+
+            function editParticipant(id) {
+                const p = participantsData.find(p => p.participantid == id);
+                if (!p) return;
+
+                document.getElementById('participantModal').style.display = 'block';
+                document.getElementById('modalTitle').innerText = 'Edit Participant';
+                document.getElementById('participantForm').action = `/participants/edit/${p.participantid}`;
+
+                const form = document.getElementById('participantForm');
+                form.participantfirstname.value = p.participantfirstname;
+                form.participantlastname.value = p.participantlastname;
+                form.participantemail.value = p.participantemail;
+                form.participantphone.value = p.participantphone || '';
+                form.participantaddress.value = p.participantaddress || '';
+                form.participantcity.value = p.participantcity || '';
+                form.participantstate.value = p.participantstate || '';
+                form.participantzip.value = p.participantzip || '';
+                form.participantdateofbirth.value = p.participantdateofbirth ? p.participantdateofbirth.split('T')[0] : '';
+                form.participantgender.value = p.participantgender || '';
+            }
+
+            // Close modal if clicked outside
+            window.onclick = function (event) {
+                if (event.target == document.getElementById('participantModal')) {
+                    closeModal();
+                }
+            }
+        </script>
 
         <%- include('partials/footer') %>

@@ -1,74 +1,86 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
 
-        <div class="container section" style="margin-top: 4rem;">
-            <div class="form-container">
-                <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem;">
-                    <button onclick="showForm('login')" id="loginBtn" class="btn btn-primary">Login</button>
-                    <button onclick="showForm('signup')" id="signupBtn" class="btn btn-outline">Sign Up</button>
-                </div>
+        <div class="container section" style="margin-top: 4rem; max-width: 400px;">
+            <div class="card" style="text-align: center;">
+                <h1 id="formTitle">Login</h1>
 
-                <% if (typeof error !=='undefined' && error) { %>
-                    <div style="color: #CE325B; text-align: center; margin-bottom: 1rem;">
+                <% if (typeof error !=='undefined' ) { %>
+                    <div
+                        style="background: #ffebee; color: #c62828; padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem;">
                         <%= error %>
                     </div>
                     <% } %>
 
                         <!-- Login Form -->
                         <form id="loginForm" action="/login" method="POST">
-                            <h2 style="text-align: center; margin-bottom: 1.5rem;">Welcome Back</h2>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" name="email" required>
+                            <div class="form-group" style="text-align: left;">
+                                <label>Email</label>
+                                <input type="email" name="email" required
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                             </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" name="password" required>
+                            <div class="form-group" style="text-align: left; margin-top: 1rem;">
+                                <label>Password</label>
+                                <input type="password" name="password" required
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                            <button type="submit" class="btn btn-primary"
+                                style="width: 100%; margin-top: 1.5rem;">Login</button>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                                Don't have an account? <a href="#" onclick="toggleForm()">Sign up</a>
+                            </p>
                         </form>
 
-                        <!-- Signup Form -->
+                        <!-- Signup Form (Hidden by default) -->
                         <form id="signupForm" action="/signup" method="POST" style="display: none;">
-                            <h2 style="text-align: center; margin-bottom: 1.5rem;">Create Account</h2>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" name="email" required>
+                            <div class="form-group" style="text-align: left;">
+                                <label>First Name</label>
+                                <input type="text" name="firstname" required
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                             </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" name="password" required>
+                            <div class="form-group" style="text-align: left; margin-top: 1rem;">
+                                <label>Last Name</label>
+                                <input type="text" name="lastname" required
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                             </div>
-                            <div class="form-group">
-                                <label for="confirm_password">Confirm Password</label>
-                                <input type="password" name="confirm_password" required>
+                            <div class="form-group" style="text-align: left; margin-top: 1rem;">
+                                <label>Email</label>
+                                <input type="email" name="email" required
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+                            <div class="form-group" style="text-align: left; margin-top: 1rem;">
+                                <label>Password</label>
+                                <input type="password" name="password" required
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                            <div class="form-group" style="text-align: left; margin-top: 1rem;">
+                                <label>Confirm Password</label>
+                                <input type="password" name="confirm_password" required
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Sign
+                                Up</button>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                                Already have an account? <a href="#" onclick="toggleForm()">Login</a>
+                            </p>
                         </form>
             </div>
         </div>
 
         <script>
-            function showForm(form) {
+            function toggleForm() {
                 const loginForm = document.getElementById('loginForm');
                 const signupForm = document.getElementById('signupForm');
-                const loginBtn = document.getElementById('loginBtn');
-                const signupBtn = document.getElementById('signupBtn');
+                const title = document.getElementById('formTitle');
 
-                if (form === 'login') {
+                if (loginForm.style.display === 'none') {
                     loginForm.style.display = 'block';
                     signupForm.style.display = 'none';
-                    loginBtn.classList.add('btn-primary');
-                    loginBtn.classList.remove('btn-outline');
-                    signupBtn.classList.add('btn-outline');
-                    signupBtn.classList.remove('btn-primary');
+                    title.innerText = 'Login';
                 } else {
                     loginForm.style.display = 'none';
                     signupForm.style.display = 'block';
-                    signupBtn.classList.add('btn-primary');
-                    signupBtn.classList.remove('btn-outline');
-                    loginBtn.classList.add('btn-outline');
-                    loginBtn.classList.remove('btn-primary');
+                    title.innerText = 'Sign Up';
                 }
             }
         </script>
