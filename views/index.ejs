@@ -1,19 +1,92 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
 
-        <div class="container section">
-            <div style="margin-top: 4rem; margin-bottom: 6rem;">
-                <h1>Empowering the<br>Future Generation<br>of Women.</h1>
-                <p style="font-size: 1.2rem; max-width: 600px; margin-top: 2rem;">
-                    Ella Rises invites young women to pursue higher education and
-                    embrace their heritage through culturally rooted programs and experiences.
-                </p>
-                <div style="margin-top: 3rem;">
-                    <a href="/programs" class="btn btn-primary">View Programs</a>
-                    <a href="/donate" class="btn btn-outline" style="margin-left: 1rem;">Donate Now</a>
+        <!-- Hero Carousel -->
+        <div class="carousel-container">
+            <div class="carousel-slide active" style="background-image: url('/images/carousel_1.png');">
+                <div class="carousel-overlay">
+                    <div class="carousel-content">
+                        <h1>Empowering the<br>Future Generation<br>of Women.</h1>
+                        <p>Ella Rises invites young women to pursue higher education and embrace their heritage through
+                            culturally rooted programs and experiences.</p>
+                        <div style="margin-top: 2rem;">
+                            <a href="/programs" class="btn btn-primary">View Programs</a>
+                            <a href="/donate" class="btn btn-outline"
+                                style="margin-left: 1rem; border-color: #FFF; color: #FFF;">Donate Now</a>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <a href="https://docs.google.com/forms/d/1hUJeUu-q9w7ajSUU9jjgYsF8XjGPO7_ElktBYiMt-uU/viewform?edit_requested=true"
+                                target="_blank" class="enroll-btn">Click here to enroll</a>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="carousel-slide" style="background-image: url('/images/carousel_2.png');">
+                <div class="carousel-overlay">
+                    <div class="carousel-content">
+                        <h1>Celebrating Culture<br>& Heritage</h1>
+                        <p>Connecting young women with their roots to build a stronger future.</p>
+                        <div style="margin-top: 2rem;">
+                            <a href="/programs" class="btn btn-primary">View Programs</a>
+                            <a href="/donate" class="btn btn-outline"
+                                style="margin-left: 1rem; border-color: #FFF; color: #FFF;">Donate Now</a>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <a href="https://docs.google.com/forms/d/1hUJeUu-q9w7ajSUU9jjgYsF8XjGPO7_ElktBYiMt-uU/viewform?edit_requested=true"
+                                target="_blank" class="enroll-btn">Click here to enroll</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-slide" style="background-image: url('/images/carousel_3.png');">
+                <div class="carousel-overlay">
+                    <div class="carousel-content">
+                        <h1>Inspiring Leadership<br>& Confidence</h1>
+                        <p>Providing mentorship and resources to help young women achieve their dreams.</p>
+                        <div style="margin-top: 2rem;">
+                            <a href="/programs" class="btn btn-primary">View Programs</a>
+                            <a href="/donate" class="btn btn-outline"
+                                style="margin-left: 1rem; border-color: #FFF; color: #FFF;">Donate Now</a>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <a href="https://docs.google.com/forms/d/1hUJeUu-q9w7ajSUU9jjgYsF8XjGPO7_ElktBYiMt-uU/viewform?edit_requested=true"
+                                target="_blank" class="enroll-btn">Click here to enroll</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <script>
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.carousel-slide');
+
+            function nextSlide() {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+
+            setInterval(nextSlide, 5000); // Change slide every 5 seconds
+        </script>
+
+        <!-- Signature Programs Section -->
+        <section class="signature-programs">
+            <div class="container">
+                <div class="signature-content">
+                    <div class="signature-text">
+                        <h2>Empowering the future generation of women.</h2>
+                        <p>Our signature programs and the Ella Rises Summit serve over 150 young women each year!</p>
+                        <a href="/donate" class="btn btn-primary">Donate</a>
+                    </div>
+                    <div class="signature-image">
+                        <img src="/images/mariposa_naranja.png" alt="Mariposa Naranja - Ella Rises">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container section">
             <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
                 <div class="card">
                     <h3>Our Mission</h3>
@@ -28,6 +101,32 @@
                 <div class="card">
                     <h3>Get Involved</h3>
                     <p>Join us as a mentor, volunteer, or donor to help shape the next generation of leaders.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thank You Section -->
+        <div class="thank-you-section">
+            <div class="container">
+                <h2>THANK YOU</h2>
+                <p>A big thank you to our supporters who make it possible for us to accomplish our goals and provide
+                    these wonderful programs for our young women!</p>
+                <p class="impact-text">Your generous contributions have lasting impact.</p>
+
+                <div class="sponsor-logos">
+
+                    <a href="https://www.ensign.edu/" target="_blank">
+                        <img src="/images/ensign.png" alt="Sponsor Logo">
+                    </a>
+                    <a href="https://thanksgivingpoint.org/our-mission/" target="_blank">
+                        <img src="/images/Logo.avif" alt="Sponsor Logo">
+                    </a>
+                    <a href="https://www.uvu.edu/education/creative-learning/" target="_blank">
+                        <img src="/images/creatingstudio.avif" alt="Sponsor Logo">
+                    </a>
+                    <a href="https://www.facebook.com/EagleMountainDataCenter/" target="_blank">
+                        <img src="/images/meta.avif" alt="Sponsor Logo">
+                    </a>
                 </div>
             </div>
         </div>
