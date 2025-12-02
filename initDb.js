@@ -1,6 +1,12 @@
 const db = require('./db');
 const bcrypt = require('bcrypt');
 
+// Prevent table recreation on Elastic Beanstalk
+if (process.env.NODE_ENV === 'production') {
+    console.log("initDb skipped in production.");
+    process.exit(0);
+}
+
 async function initDb() {
     try {
         // Create users table
