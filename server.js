@@ -79,13 +79,6 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
-    // Hardcoded test user (Bypasses DB)
-    if (email === 'admin@test.com' && password === 'admin') {
-        req.session.user = { userid: 999, email: 'admin@test.com', role: 'Manager', firstname: 'Admin', lastname: 'User' };
-        return res.redirect('/dashboard');
-    }
-
     try {
         const user = await db('users').where({ email: email }).first();
         if (user && await bcrypt.compare(password, user.password)) {
@@ -138,19 +131,6 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/dashboard', checkManager, async (req, res) => {
-    // Mock data for test user
-    if (req.session.user && req.session.user.username === 'test') {
-        const participants = [
-            { id: 1, name: 'Test Participant', age: 18, school: 'Test High', eventsAttended: 5 },
-            { id: 2, name: 'Another Student', age: 16, school: 'Mock School', eventsAttended: 2 }
-        ];
-        const events = [
-            { id: 1, name: 'Test Event', date: '2025-01-01', type: 'Workshop', attendees: 10 },
-            { id: 2, name: 'Mock Seminar', date: '2025-02-01', type: 'Seminar', attendees: 20 }
-        ];
-        return res.render('dashboard', { title: 'Dashboard', participants, events, user: req.session.user });
-    }
-
     try {
         const participants = await db('participants').select('*');
         const events = await db("event_occurrences as eo")
@@ -161,7 +141,10 @@ app.get('/dashboard', checkManager, async (req, res) => {
                 "et.eventtype",
                 "et.eventdescription"
             );
-        res.render('dashboard', { title: 'Dashboard', participants, events, user: req.session.user });
+        const avgSatisfactionResult = await db('surveys').avg('surveysatisfactionscore as avg');
+        const avgSatisfaction = avgSatisfactionResult[0].avg ? parseFloat(avgSatisfactionResult[0].avg).toFixed(1) : '0.0';
+
+        res.render('dashboard', { title: 'Dashboard', participants, events, avgSatisfaction, user: req.session.user });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -379,7 +362,7 @@ app.post('/events/register', checkAuth, async (req, res) => {
 // User Maintenance Routes
 app.get('/users', checkManager, async (req, res) => {
     try {
-        const users = await db('users').select('userid', 'email', 'role').orderBy('userid');
+        const users = await db('users').select('userid', 'email', 'userfirstname', 'userlastname', 'role').orderBy('userid');
         res.render('users', { title: 'User Management', users, user: req.session.user });
     } catch (err) {
         console.error(err);
@@ -388,10 +371,10 @@ app.get('/users', checkManager, async (req, res) => {
 });
 
 app.post('/users/add', checkManager, async (req, res) => {
-    const { email, password, role } = req.body;
+    const { email, password, role, userfirstname, userlastname } = req.body;
     try {
         const password_hash = await bcrypt.hash(password, 10);
-        await db('users').insert({ email, password: password_hash, role });
+        await db('users').insert({ email, password: password_hash, role, userfirstname, userlastname });
         res.redirect('/users');
     } catch (err) {
         console.error(err);
@@ -401,9 +384,9 @@ app.post('/users/add', checkManager, async (req, res) => {
 
 app.post('/users/edit/:id', checkManager, async (req, res) => {
     const { id } = req.params;
-    const { email, password, role } = req.body;
+    const { email, password, role, userfirstname, userlastname } = req.body;
     try {
-        const updateData = { email, role };
+        const updateData = { email, role, userfirstname, userlastname };
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }
@@ -622,15 +605,7 @@ app.post('/donations/delete/:id', checkManager, async (req, res) => {
     }
 });
 
-app.get('/test-db', async (req, res) => {
-    try {
-        const result = await db.raw('SELECT NOW()');
-        res.json({ success: true, time: result.rows[0] });
-    } catch (err) {
-        console.error('DB connection failed:', err);
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
+
 
 app.listen(port, () => {
     console.log(`Ella Rises prototype running at http://localhost:${port}`);

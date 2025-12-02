@@ -51,7 +51,7 @@
                                     <%= p.participantcity %>, <%= p.participantstate %>
                                 </td>
                                 <td style="padding: 1rem;">
-                                    <%= new Date(p.participantdateofbirth).toLocaleDateString() %>
+                                    <%= new Date(p.participantdob).toLocaleDateString() %>
                                 </td>
                                 <% if (user && user.role==='Manager' ) { %>
                                     <td style="padding: 1rem;">

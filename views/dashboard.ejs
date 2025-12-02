@@ -4,25 +4,27 @@
         <div class="container section" style="margin-top: 4rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <h1>Dashboard</h1>
-                <span style="color: var(--text-secondary);">Welcome, <%= user.username %></span>
+                <span style="color: var(--text-secondary);">Welcome, <%= user.userfirstname %></span>
             </div>
 
             <div class="dashboard-grid">
                 <div class="card stat-card">
                     <h3>Total Participants</h3>
                     <p class="number">
-                        <%= participants.length * 150 %>
+                        <%= participants.length %>
                     </p>
                 </div>
                 <div class="card stat-card">
                     <h3>Events This Year</h3>
                     <p class="number">
-                        <%= events.length * 12 %>
+                        <%= events.length %>
                     </p>
                 </div>
                 <div class="card stat-card">
                     <h3>Avg Satisfaction</h3>
-                    <p class="number">4.8/5</p>
+                    <p class="number">
+                        <%= avgSatisfaction %>/5
+                    </p>
                 </div>
             </div>
 
