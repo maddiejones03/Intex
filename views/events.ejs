@@ -56,12 +56,14 @@
                                                 <form action="/events/occurrences/delete/<%= o.eventoccurrenceid %>"
                                                     method="POST" onsubmit="return confirm('Are you sure?');"
                                                     style="display: inline;">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                                     <button type="submit" class="btn btn-primary"
                                                         style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
                                                 </form>
                                             </div>
                                             <% } else { %>
                                                 <form action="/events/register" method="POST" style="display: inline;">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                                     <input type="hidden" name="eventoccurrenceid"
                                                         value="<%= o.eventoccurrenceid %>">
                                                     <button type="submit" class="btn btn-primary"
@@ -118,6 +120,7 @@
                                                 <form action="/events/templates/delete/<%= t.eventtemplateid %>"
                                                     method="POST" onsubmit="return confirm('Are you sure?');"
                                                     style="display: inline;">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                                     <button type="submit" class="btn btn-primary"
                                                         style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
                                                 </form>
@@ -141,6 +144,7 @@
                     style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
                 <h2 id="occurrenceModalTitle" style="margin-bottom: 1.5rem;">Schedule Occurrence</h2>
                 <form id="occurrenceForm" action="/events/occurrences/add" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <div class="form-group">
                         <label>Event Template</label>
                         <select name="eventtemplateid" required
@@ -192,6 +196,7 @@
                     style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
                 <h2 id="templateModalTitle" style="margin-bottom: 1.5rem;">Add Template</h2>
                 <form id="templateForm" action="/events/templates/add" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <div class="form-group">
                         <label>Event Name</label>
                         <input type="text" name="eventname" required

@@ -14,6 +14,7 @@
 
                         <!-- Login Form -->
                         <form id="loginForm" action="/login" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <div class="form-group" style="text-align: left;">
                                 <label>Email</label>
                                 <input type="email" name="email" required
@@ -33,6 +34,7 @@
 
                         <!-- Signup Form (Hidden by default) -->
                         <form id="signupForm" action="/signup" method="POST" style="display: none;">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <div class="form-group" style="text-align: left;">
                                 <label>First Name</label>
                                 <input type="text" name="firstname" required

@@ -56,11 +56,12 @@
                                 <% if (user && user.role==='Manager' ) { %>
                                     <td style="padding: 1rem;">
                                         <div style="display: flex; gap: 0.5rem;">
-                                            <button onclick="editMilestone('<%= m.milestoneid %>')"
+                                            <button onclick="openEditModal('<%= m.milestoneid %>')"
                                                 class="btn btn-outline"
                                                 style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
                                             <form action="/milestones/delete/<%= m.milestoneid %>" method="POST"
                                                 onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                                 <button type="submit" class="btn btn-primary"
                                                     style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
                                             </form>
@@ -74,15 +75,16 @@
             </div>
         </div>
 
-        <!-- Add/Edit Modal -->
-        <div id="milestoneModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <!-- Add Milestone Modal -->
+        <div id="addMilestoneModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
             <div class="modal-content"
                 style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
-                <span onclick="closeModal()"
+                <span onclick="closeAddModal()"
                     style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Add Milestone</h2>
-                <form id="milestoneForm" action="/milestones/add" method="POST">
+                <h2 style="margin-bottom: 1.5rem;">Add Milestone</h2>
+                <form id="addMilestoneForm" action="/milestones/add" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <div class="form-group">
                         <label>Participant</label>
                         <select name="participantid" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
@@ -110,39 +112,81 @@
             </div>
         </div>
 
+        <!-- Edit Milestone Modal -->
+        <div id="editMilestoneModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+            <div class="modal-content"
+                style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
+                <span onclick="closeEditModal()"
+                    style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 style="margin-bottom: 1.5rem;">Edit Milestone</h2>
+                <form id="editMilestoneForm" action="" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="form-group">
+                        <label>Participant</label>
+                        <select id="edit_participantid" name="participantid"
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="">-- Select Participant (Optional) --</option>
+                            <% participants.forEach(p=> { %>
+                                <option value="<%= p.participantid %>">
+                                    <%= p.participantfirstname %>
+                                        <%= p.participantlastname %>
+                                </option>
+                                <% }) %>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Title</label>
+                        <input type="text" id="edit_milestonetitle" name="milestonetitle" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Date</label>
+                        <input type="date" id="edit_milestonedate" name="milestonedate" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update</button>
+                </form>
+            </div>
+        </div>
+
         <script>
             const milestonesData = <% - JSON.stringify(milestones) %>;
 
-            function openModal() {
-                document.getElementById('milestoneModal').style.display = 'block';
-                document.getElementById('modalTitle').innerText = 'Add Milestone';
-                document.getElementById('milestoneForm').action = '/milestones/add';
-                document.getElementById('milestoneForm').reset();
-                document.querySelector('input[name="milestonedate"]').valueAsDate = new Date();
+            function openAddModal() {
+                document.getElementById('addMilestoneModal').style.display = 'block';
+                document.getElementById('addMilestoneForm').reset();
+                document.querySelector('#addMilestoneForm input[name="milestonedate"]').valueAsDate = new Date();
             }
 
-            function closeModal() {
-                document.getElementById('milestoneModal').style.display = 'none';
+            function closeAddModal() {
+                document.getElementById('addMilestoneModal').style.display = 'none';
             }
 
-            function editMilestone(id) {
+            function openEditModal(id) {
                 const m = milestonesData.find(m => m.milestoneid == id);
                 if (!m) return;
 
-                document.getElementById('milestoneModal').style.display = 'block';
-                document.getElementById('modalTitle').innerText = 'Edit Milestone';
-                document.getElementById('milestoneForm').action = `/milestones/edit/${m.milestoneid}`;
+                document.getElementById('editMilestoneModal').style.display = 'block';
+                const form = document.getElementById('editMilestoneForm');
+                form.action = `/milestones/edit/${m.milestoneid}`;
 
-                const form = document.getElementById('milestoneForm');
-                form.participantid.value = m.participantid || '';
-                form.milestonetitle.value = m.milestonetitle;
-                form.milestonedate.value = m.milestonedate ? m.milestonedate.split('T')[0] : '';
+                document.getElementById('edit_participantid').value = m.participantid || '';
+                document.getElementById('edit_milestonetitle').value = m.milestonetitle;
+                document.getElementById('edit_milestonedate').value = m.milestonedate ? m.milestonedate.split('T')[0] : '';
             }
 
-            // Close modal if clicked outside
+            function closeEditModal() {
+                document.getElementById('editMilestoneModal').style.display = 'none';
+            }
+
+            // Close modals if clicked outside
             window.onclick = function (event) {
-                if (event.target == document.getElementById('milestoneModal')) {
-                    closeModal();
+                if (event.target == document.getElementById('addMilestoneModal')) {
+                    closeAddModal();
+                }
+                if (event.target == document.getElementById('editMilestoneModal')) {
+                    closeEditModal();
                 }
             }
         </script>

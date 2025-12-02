@@ -1,0 +1,266 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="container section" style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>Grants</h1>
+                <button onclick="document.getElementById('addGrantModal').style.display='block'"
+                    class="btn btn-primary">Add Grant</button>
+            </div>
+
+            <!-- Search Bar -->
+            <form action="/grants" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" placeholder="Search grants or organizations..."
+                    value="<%= typeof search !== 'undefined' ? search : '' %>"
+                    style="flex: 1; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <% if (typeof search !=='undefined' && search) { %>
+                    <a href="/grants" class="btn btn-outline">Clear</a>
+                    <% } %>
+            </form>
+
+            <div class="card">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                            <th style="padding: 1rem;">Grant Name</th>
+                            <th style="padding: 1rem;">Organization</th>
+                            <th style="padding: 1rem;">Status</th>
+                            <th style="padding: 1rem;">Amount Requested</th>
+                            <th style="padding: 1rem;">Amount Awarded</th>
+                            <th style="padding: 1rem;">Due Date</th>
+                            <th style="padding: 1rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% grants.forEach(grant=> { %>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 1rem;">
+                                    <strong>
+                                        <%= grant.grantname %>
+                                    </strong>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= grant.orgname %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <span
+                                        style="padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; 
+                                background-color: <%= grant.grantstatus === 'Awarded' ? '#e8f5e9' : (grant.grantstatus === 'Denied' ? '#ffebee' : '#e3f2fd') %>;
+                                color: <%= grant.grantstatus === 'Awarded' ? '#2e7d32' : (grant.grantstatus === 'Denied' ? '#c62828' : '#1565c0') %>;">
+                                        <%= grant.grantstatus %>
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= grant.grantamountrequested ? '$' +
+                                        parseFloat(grant.grantamountrequested).toLocaleString() : '-' %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= grant.grantamountawarded ? '$' +
+                                        parseFloat(grant.grantamountawarded).toLocaleString() : '-' %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= grant.grantduedate ? new Date(grant.grantduedate).toLocaleDateString() : '-' %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button
+                                            onclick="editGrant('<%= JSON.stringify(grant).replace(/'/g, '&#39;') %>')"
+                                            class="btn btn-outline"
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
+                                        <form action="/grants/delete/<%= grant.grantid %>" method="POST"
+                                            onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                            <button type="submit" class="btn btn-primary"
+                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Grant Modal -->
+        <div id="addGrantModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+            <div class="form-container"
+                style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
+                <span onclick="document.getElementById('addGrantModal').style.display='none'"
+                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 style="text-align: center; margin-bottom: 2rem;">Add Grant</h2>
+                <form action="/grants/add" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="form-group">
+                        <label>Grant Name</label>
+                        <input type="text" name="grantname" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Organization</label>
+                        <select name="grantorganizationid" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="">Select Organization</option>
+                            <% organizations.forEach(org=> { %>
+                                <option value="<%= org.orgid %>">
+                                    <%= org.orgname %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Amount Requested</label>
+                            <input type="number" step="0.01" name="grantamountrequested"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount Awarded</label>
+                            <input type="number" step="0.01" name="grantamountawarded"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Status</label>
+                        <select name="grantstatus" required style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="In Progress">In Progress</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Awarded">Awarded</option>
+                            <option value="Denied">Denied</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="date" name="grantduedate"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Submitted Date</label>
+                            <input type="date" name="grantsubmitteddate"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Decision Date</label>
+                            <input type="date" name="grantdecisiondate"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Notes</label>
+                        <textarea name="grantnotes" rows="3"
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
+                        Grant</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Grant Modal -->
+        <div id="editGrantModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+            <div class="form-container"
+                style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
+                <span onclick="document.getElementById('editGrantModal').style.display='none'"
+                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 style="text-align: center; margin-bottom: 2rem;">Edit Grant</h2>
+                <form id="editGrantForm" action="" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="form-group">
+                        <label>Grant Name</label>
+                        <input type="text" id="edit_grantname" name="grantname" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Organization</label>
+                        <select id="edit_grantorganizationid" name="grantorganizationid" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="">Select Organization</option>
+                            <% organizations.forEach(org=> { %>
+                                <option value="<%= org.orgid %>">
+                                    <%= org.orgname %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Amount Requested</label>
+                            <input type="number" step="0.01" id="edit_grantamountrequested" name="grantamountrequested"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount Awarded</label>
+                            <input type="number" step="0.01" id="edit_grantamountawarded" name="grantamountawarded"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Status</label>
+                        <select id="edit_grantstatus" name="grantstatus" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="In Progress">In Progress</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Awarded">Awarded</option>
+                            <option value="Denied">Denied</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="date" id="edit_grantduedate" name="grantduedate"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Submitted Date</label>
+                            <input type="date" id="edit_grantsubmitteddate" name="grantsubmitteddate"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Decision Date</label>
+                            <input type="date" id="edit_grantdecisiondate" name="grantdecisiondate"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Notes</label>
+                        <textarea id="edit_grantnotes" name="grantnotes" rows="3"
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
+                        Grant</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function editGrant(grantStr) {
+                const grant = JSON.parse(grantStr);
+                document.getElementById('editGrantForm').action = '/grants/edit/' + grant.grantid;
+                document.getElementById('edit_grantname').value = grant.grantname;
+                document.getElementById('edit_grantorganizationid').value = grant.grantorganizationid;
+                document.getElementById('edit_grantamountrequested').value = grant.grantamountrequested || '';
+                document.getElementById('edit_grantamountawarded').value = grant.grantamountawarded || '';
+                document.getElementById('edit_grantstatus').value = grant.grantstatus;
+
+                // Format dates for input type="date" (YYYY-MM-DD)
+                if (grant.grantduedate) document.getElementById('edit_grantduedate').value = grant.grantduedate.split('T')[0];
+                if (grant.grantsubmitteddate) document.getElementById('edit_grantsubmitteddate').value = grant.grantsubmitteddate.split('T')[0];
+                if (grant.grantdecisiondate) document.getElementById('edit_grantdecisiondate').value = grant.grantdecisiondate.split('T')[0];
+
+                document.getElementById('edit_grantnotes').value = grant.grantnotes || '';
+                document.getElementById('editGrantModal').style.display = 'block';
+            }
+
+            // Close modals when clicking outside
+            window.onclick = function (event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = "none";
+                }
+            }
+        </script>
+
+        <%- include('partials/footer') %>

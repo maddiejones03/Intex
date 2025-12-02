@@ -5,6 +5,9 @@ const bcrypt = require('bcrypt');
 const db = require('./db');
 
 
+const helmet = require('helmet');
+const csurf = require('csurf');
+
 const app = express();
 const port = process.env.PORT || 8080;
 
@@ -18,6 +21,18 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false } // Set to true if using HTTPS
 }));
+
+// Security Middleware
+app.use(helmet({
+    contentSecurityPolicy: false, // Disabled to allow inline scripts/styles in this prototype
+}));
+app.use(csurf());
+
+// Make CSRF token available in all views
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 // Auth Middleware
 const checkAuth = (req, res, next) => {
@@ -83,7 +98,7 @@ app.post('/login', async (req, res) => {
         const user = await db('users').where({ email: email }).first();
         if (user && await bcrypt.compare(password, user.password)) {
             req.session.user = user;
-            res.redirect('/dashboard');
+            res.redirect('/');
         } else {
             res.render('login', { title: 'Login', user: req.session.user, error: 'Invalid credentials' });
         }
@@ -362,7 +377,7 @@ app.post('/events/register', checkAuth, async (req, res) => {
 // User Maintenance Routes
 app.get('/users', checkManager, async (req, res) => {
     try {
-        const users = await db('users').select('userid', 'email', 'userfirstname', 'userlastname', 'role').orderBy('userid');
+        const users = await db('users').select('userid', 'email', 'firstname', 'lastname', 'role').orderBy('userid');
         res.render('users', { title: 'User Management', users, user: req.session.user });
     } catch (err) {
         console.error(err);
@@ -371,10 +386,10 @@ app.get('/users', checkManager, async (req, res) => {
 });
 
 app.post('/users/add', checkManager, async (req, res) => {
-    const { email, password, role, userfirstname, userlastname } = req.body;
+    const { email, password, role, firstname, lastname } = req.body;
     try {
         const password_hash = await bcrypt.hash(password, 10);
-        await db('users').insert({ email, password: password_hash, role, userfirstname, userlastname });
+        await db('users').insert({ email, password: password_hash, role, firstname, lastname });
         res.redirect('/users');
     } catch (err) {
         console.error(err);
@@ -384,9 +399,9 @@ app.post('/users/add', checkManager, async (req, res) => {
 
 app.post('/users/edit/:id', checkManager, async (req, res) => {
     const { id } = req.params;
-    const { email, password, role, userfirstname, userlastname } = req.body;
+    const { email, password, role, firstname, lastname } = req.body;
     try {
-        const updateData = { email, role, userfirstname, userlastname };
+        const updateData = { email, role, firstname, lastname };
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }
@@ -606,6 +621,177 @@ app.post('/donations/delete/:id', checkManager, async (req, res) => {
 });
 
 
+
+// Organizations Routes
+app.get('/organizations', checkManager, async (req, res) => {
+    const { search } = req.query;
+    try {
+        let query = db('organizations').select('*').orderBy('orgname');
+
+        if (search) {
+            query = query.where('orgname', 'ilike', `%${search}%`)
+                .orWhere('orgcity', 'ilike', `%${search}%`)
+                .orWhere('orgstate', 'ilike', `%${search}%`);
+        }
+        const organizations = await query;
+
+        // Fetch contacts for all organizations
+        const contacts = await db('contacts').select('*').orderBy('contactlastname');
+
+        res.render('organizations', { title: 'Organizations', organizations, contacts, user: req.session.user, search });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.post('/organizations/add', checkManager, async (req, res) => {
+    const { orgname, orgaddress, orgcity, orgstate, orgzipcode, orgcountry, orgemail, orgphonenumber, orgwebsiteurl, orgdescription } = req.body;
+    try {
+        await db('organizations').insert({
+            orgname, orgaddress, orgcity, orgstate, orgzipcode, orgcountry, orgemail, orgphonenumber, orgwebsiteurl, orgdescription
+        });
+        res.redirect('/organizations');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error adding organization');
+    }
+});
+
+app.post('/organizations/edit/:id', checkManager, async (req, res) => {
+    const { id } = req.params;
+    const { orgname, orgaddress, orgcity, orgstate, orgzipcode, orgcountry, orgemail, orgphonenumber, orgwebsiteurl, orgdescription } = req.body;
+    try {
+        await db('organizations').where({ orgid: id }).update({
+            orgname, orgaddress, orgcity, orgstate, orgzipcode, orgcountry, orgemail, orgphonenumber, orgwebsiteurl, orgdescription,
+            orgupdatedat: new Date()
+        });
+        res.redirect('/organizations');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error updating organization');
+    }
+});
+
+app.post('/organizations/delete/:id', checkManager, async (req, res) => {
+    const { id } = req.params;
+    try {
+        await db('organizations').where({ orgid: id }).del();
+        res.redirect('/organizations');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error deleting organization');
+    }
+});
+
+// Contacts Routes
+app.post('/contacts/add', checkManager, async (req, res) => {
+    const { contactorganizationid, contactfirstname, contactlastname, contactemail, contactphone, contacttitle, contactnotes } = req.body;
+    try {
+        await db('contacts').insert({
+            contactorganizationid, contactfirstname, contactlastname, contactemail, contactphone, contacttitle, contactnotes
+        });
+        res.redirect('/organizations');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error adding contact');
+    }
+});
+
+app.post('/contacts/edit/:id', checkManager, async (req, res) => {
+    const { id } = req.params;
+    const { contactorganizationid, contactfirstname, contactlastname, contactemail, contactphone, contacttitle, contactnotes } = req.body;
+    try {
+        await db('contacts').where({ contactid: id }).update({
+            contactorganizationid, contactfirstname, contactlastname, contactemail, contactphone, contacttitle, contactnotes,
+            contactupdatedat: new Date()
+        });
+        res.redirect('/organizations');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error updating contact');
+    }
+});
+
+app.post('/contacts/delete/:id', checkManager, async (req, res) => {
+    const { id } = req.params;
+    try {
+        await db('contacts').where({ contactid: id }).del();
+        res.redirect('/organizations');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error deleting contact');
+    }
+});
+
+// Grants Routes
+app.get('/grants', checkManager, async (req, res) => {
+    const { search } = req.query;
+    try {
+        let query = db('grants')
+            .join('organizations', 'grants.grantorganizationid', 'organizations.orgid')
+            .select('grants.*', 'organizations.orgname');
+
+        if (search) {
+            query = query.where('grants.grantname', 'ilike', `%${search}%`)
+                .orWhere('organizations.orgname', 'ilike', `%${search}%`);
+        }
+        const grants = await query;
+        const organizations = await db('organizations').select('orgid', 'orgname').orderBy('orgname');
+
+        res.render('grants', { title: 'Grants', grants, organizations, user: req.session.user, search });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.post('/grants/add', checkManager, async (req, res) => {
+    const { grantorganizationid, grantname, grantamountrequested, grantamountawarded, grantstatus, grantduedate, grantsubmitteddate, grantdecisiondate, grantnotes } = req.body;
+    try {
+        await db('grants').insert({
+            grantorganizationid, grantname, grantamountrequested, grantamountawarded, grantstatus,
+            grantduedate: grantduedate || null,
+            grantsubmitteddate: grantsubmitteddate || null,
+            grantdecisiondate: grantdecisiondate || null,
+            grantnotes
+        });
+        res.redirect('/grants');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error adding grant');
+    }
+});
+
+app.post('/grants/edit/:id', checkManager, async (req, res) => {
+    const { id } = req.params;
+    const { grantorganizationid, grantname, grantamountrequested, grantamountawarded, grantstatus, grantduedate, grantsubmitteddate, grantdecisiondate, grantnotes } = req.body;
+    try {
+        await db('grants').where({ grantid: id }).update({
+            grantorganizationid, grantname, grantamountrequested, grantamountawarded, grantstatus,
+            grantduedate: grantduedate || null,
+            grantsubmitteddate: grantsubmitteddate || null,
+            grantdecisiondate: grantdecisiondate || null,
+            grantnotes,
+            grantupdatedat: new Date()
+        });
+        res.redirect('/grants');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error updating grant');
+    }
+});
+
+app.post('/grants/delete/:id', checkManager, async (req, res) => {
+    const { id } = req.params;
+    try {
+        await db('grants').where({ grantid: id }).del();
+        res.redirect('/grants');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error deleting grant');
+    }
+});
 
 app.listen(port, () => {
     console.log(`Ella Rises prototype running at http://localhost:${port}`);

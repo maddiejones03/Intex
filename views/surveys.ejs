@@ -64,6 +64,7 @@
                                                 style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
                                             <form action="/surveys/delete/<%= s.surveyid %>" method="POST"
                                                 onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                                 <button type="submit" class="btn btn-primary"
                                                     style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
                                             </form>
@@ -77,65 +78,37 @@
             </div>
         </div>
 
-        <!-- Add/Edit Modal -->
-        <div id="surveyModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-            <div class="modal-content"
-                style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 600px; border-radius: 8px; position: relative; max-height: 90vh; overflow-y: auto;">
-                <span onclick="closeModal()"
-                    style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Add Submission</h2>
-                <form id="surveyForm" action="/surveys/add" method="POST">
+        <!-- Add Survey Modal -->
+        <div id="addSurveyModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+            <div class="form-container"
+                style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
+                <span onclick="document.getElementById('addSurveyModal').style.display='none'"
+                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 style="text-align: center; margin-bottom: 2rem;">Add Survey Submission</h2>
+                <form action="/surveys/add" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <div class="form-group">
                         <label>Participant</label>
-                        <select name="participantid" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            <option value="">-- Select Participant (Optional) --</option>
+                        <select name="participantid" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="">Select Participant</option>
                             <% participants.forEach(p=> { %>
                                 <option value="<%= p.participantid %>">
                                     <%= p.participantfirstname %>
                                         <%= p.participantlastname %>
                                 </option>
-                                <% }) %>
+                                <% }); %>
                         </select>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                        <div class="form-group">
-                            <label>Satisfaction (1-10)</label>
-                            <input type="number" name="surveysatisfactionscore" min="1" max="10"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group">
-                            <label>Usefulness (1-10)</label>
-                            <input type="number" name="surveyusefulnessscore" min="1" max="10"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group">
-                            <label>Instructor (1-10)</label>
-                            <input type="number" name="surveyinstructorscore" min="1" max="10"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group">
-                            <label>Recommendation (1-10)</label>
-                            <input type="number" name="surveyrecommendationscore" min="1" max="10"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group">
-                            <label>Overall (1-10)</label>
-                            <input type="number" name="surveyoverallscore" min="1" max="10"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group">
-                            <label>NPS Bucket</label>
-                            <select name="surveynpsbucket" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                                <option value="Promoter">Promoter</option>
-                                <option value="Passive">Passive</option>
-                                <option value="Detractor">Detractor</option>
-                            </select>
-                        </div>
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
                         <label>Date</label>
-                        <input type="date" name="surveysubmissiondate" required
+                        <input type="date" name="surveydate" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Satisfaction Score (1-5)</label>
+                        <input type="number" name="surveysatisfactionscore" min="1" max="5" required
                             style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
@@ -143,7 +116,52 @@
                         <textarea name="surveycomments" rows="3"
                             style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Save</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
+                        Survey</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Survey Modal -->
+        <div id="editSurveyModal" class="modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+            <div class="form-container"
+                style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
+                <span onclick="document.getElementById('editSurveyModal').style.display='none'"
+                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2 style="text-align: center; margin-bottom: 2rem;">Edit Survey Submission</h2>
+                <form id="editSurveyForm" action="" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="form-group">
+                        <label>Participant</label>
+                        <select id="edit_participantid" name="participantid" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            <option value="">Select Participant</option>
+                            <% participants.forEach(p=> { %>
+                                <option value="<%= p.participantid %>">
+                                    <%= p.participantfirstname %>
+                                        <%= p.participantlastname %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Date</label>
+                        <input type="date" id="edit_surveydate" name="surveydate" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Satisfaction Score (1-5)</label>
+                        <input type="number" id="edit_surveysatisfactionscore" name="surveysatisfactionscore" min="1"
+                            max="5" required style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Comments</label>
+                        <textarea id="edit_surveycomments" name="surveycomments" rows="3"
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
+                        Survey</button>
                 </form>
             </div>
         </div>
