@@ -49,8 +49,10 @@
                             <% participants.forEach(p=> { %>
                                 <tr>
                                     <td>
-                                        <%= p.participantfirstname %>
-                                            <%= p.participantlastname %>
+                                        <a href="/participants/<%= p.participantid %>"
+                                            style="text-decoration: none; color: inherit; font-weight: bold;">
+                                            <%= p.participantfirstname %>
+                                                <%= p.participantlastname %>
                                     </td>
                                     <td>
                                         <%= p.participantemail %>
@@ -67,9 +69,8 @@
                                     <% if (user && user.role==='Manager' ) { %>
                                         <td>
                                             <div style="display: flex; gap: 0.5rem;">
-                                                <button onclick="openEditModal('<%= p.participantid %>')"
-                                                    class="btn btn-outline"
-                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px;">Edit</button>
+                                                <a href="/participants/<%= p.participantid %>" class="btn btn-outline"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px; text-decoration: none;">Edit</a>
                                                 <form action="/participants/delete/<%= p.participantid %>" method="POST"
                                                     onsubmit="return confirm('Are you sure? This will delete all associated donations and milestones.');"
                                                     style="display: inline;">
@@ -119,11 +120,7 @@
                             <input type="tel" name="participantphone"
                                 style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Address</label>
-                            <input type="text" name="participantaddress"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                             <div class="form-group">
                                 <label>City</label>
@@ -146,135 +143,27 @@
                             <input type="date" name="participantdob"
                                 style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Gender</label>
-                            <select name="participantgender" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                                <option value="">Select Gender</option>
-                                <option value="Female">Female</option>
-                                <option value="Male">Male</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
+
                         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
                             Participant</button>
                     </form>
                 </div>
             </div>
 
-            <!-- Edit Participant Modal -->
-            <div id="editParticipantModal" class="modal"
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-                <div class="form-container"
-                    style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
-                    <span onclick="document.getElementById('editParticipantModal').style.display='none'"
-                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Participant</h2>
-                    <form id="editParticipantForm" action="" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label>First Name</label>
-                                <input type="text" id="edit_participantfirstname" name="participantfirstname" required
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                            <div class="form-group">
-                                <label>Last Name</label>
-                                <input type="text" id="edit_participantlastname" name="participantlastname" required
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Email</label>
-                            <input type="email" id="edit_participantemail" name="participantemail" required
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Phone</label>
-                            <input type="tel" id="edit_participantphone" name="participantphone"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Address</label>
-                            <input type="text" id="edit_participantaddress" name="participantaddress"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                            <div class="form-group">
-                                <label>City</label>
-                                <input type="text" id="edit_participantcity" name="participantcity"
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                            <div class="form-group">
-                                <label>State</label>
-                                <input type="text" id="edit_participantstate" name="participantstate"
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                            <div class="form-group">
-                                <label>Zip</label>
-                                <input type="text" id="edit_participantzip" name="participantzip"
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Date of Birth</label>
-                            <input type="date" id="edit_participantdob" name="participantdob"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Gender</label>
-                            <select id="edit_participantgender" name="participantgender"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                                <option value="">Select Gender</option>
-                                <option value="Female">Female</option>
-                                <option value="Male">Male</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
-                            Participant</button>
-                    </form>
-                </div>
-            </div>
+
 
             <script>
-                const participantsData = <% - JSON.stringify(participants) %>;
-
-                function openModal() {
-                    document.getElementById('participantModal').style.display = 'block';
-                    document.getElementById('modalTitle').innerText = 'Add Participant';
-                    document.getElementById('participantForm').action = '/participants/add';
-                    document.getElementById('participantForm').reset();
-                }
-
-                function closeModal() {
-                    document.getElementById('participantModal').style.display = 'none';
-                }
-
-                function editParticipant(id) {
-                    const p = participantsData.find(p => p.participantid == id);
-                    if (!p) return;
-
-                    document.getElementById('participantModal').style.display = 'block';
-                    document.getElementById('modalTitle').innerText = 'Edit Participant';
-                    document.getElementById('participantForm').action = `/participants/edit/${p.participantid}`;
-
-                    const form = document.getElementById('participantForm');
-                    form.participantfirstname.value = p.participantfirstname;
-                    form.participantlastname.value = p.participantlastname;
-                    form.participantemail.value = p.participantemail;
-                    form.participantphone.value = p.participantphone || '';
-                    form.participantaddress.value = p.participantaddress || '';
-                    form.participantcity.value = p.participantcity || '';
-                    form.participantstate.value = p.participantstate || '';
-                    form.participantzip.value = p.participantzip || '';
-                    form.participantdateofbirth.value = p.participantdateofbirth ? p.participantdateofbirth.split('T')[0] : '';
-                    form.participantgender.value = p.participantgender || '';
+                function openAddModal() {
+                    const modal = document.getElementById('addParticipantModal');
+                    if (modal) modal.style.display = 'block';
                 }
 
                 // Close modal if clicked outside
                 window.onclick = function (event) {
-                    if (event.target == document.getElementById('participantModal')) {
-                        closeModal();
+                    const addModal = document.getElementById('addParticipantModal');
+
+                    if (addModal && event.target == addModal) {
+                        addModal.style.display = 'none';
                     }
                 }
             </script>

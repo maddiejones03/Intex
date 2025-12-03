@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+        <%- include('partials/aesthetic-bg') %>
+
+            <div class="container section" style="margin-top: 4rem;">
+                <div style="margin-bottom: 2rem;">
+                    <a href="/events" class="btn btn-outline">← Back to Events</a>
+                </div>
+
+                <div class="card">
+                    <h1>
+                        <%= event.eventname %>
+                    </h1>
+                    <p style="color: #666; margin-bottom: 2rem;">
+                        <%= new Date(event.eventdatetimestart).toLocaleString() %>
+                    </p>
+
+                    <% if (participants.length===0) { %>
+                        <p>No participants registered for this event.</p>
+                        <% } else { %>
+                            <table class="aesthetic-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% participants.forEach(p=> { %>
+                                        <tr>
+                                            <td>
+                                                <a href="/participants/<%= p.participantid %>"
+                                                    style="text-decoration: none; color: inherit; font-weight: bold;">
+                                                    <%= p.participantfirstname %>
+                                                        <%= p.participantlastname %>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <%= p.participantemail %>
+                                            </td>
+                                            <td>
+                                                <%= p.participantphone %>
+                                            </td>
+                                            <td>
+                                                <%= p.registrationstatus %>
+                                            </td>
+                                            <td>
+                                                <a href="/participants/<%= p.participantid %>" class="btn btn-outline"
+                                                    style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">View Profile</a>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                            <% } %>
+                </div>
+            </div>
+
+            <%- include('partials/footer') %>

@@ -17,215 +17,244 @@
                         </div>
                         <% } %>
 
-                            <form id="registerForm" action="/register/add" method="POST">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-                                <div class="form-section"
-                                    style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-                                    <h3>Parent/Guardian Information</h3>
-
-                                    <div class="form-group">
-                                        <label class="form-label required">Parent/Guardian Name | Nombre del
-                                            Padre/Madre/Tutor <span style="color: red;">*</span></label>
-                                        <input type="text" name="parentguardianname" class="form-control" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label required">Phone Number | Número de teléfono <span
-                                                style="color: red;">*</span></label>
-                                        <input type="text" name="phone" class="form-control" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label required">Parent Email Address | Correo electrónico de
-                                            los
-                                            padres <span style="color: red;">*</span></label>
-                                        <input type="email" name="email" class="form-control" required>
-                                    </div>
+                            <% if (locals.alreadyRegistered) { %>
+                                <div
+                                    style="text-align: center; padding: 3rem; background: #f8f9fa; border-radius: 12px; margin-bottom: 2rem;">
+                                    <h2 style="color: #333; margin-bottom: 1rem;">You are already registered!</h2>
+                                    <p style="color: #666; margin-bottom: 2rem;">You have already completed the
+                                        registration process.</p>
+                                    <a href="/" class="btn btn-primary">Return Home</a>
                                 </div>
+                                <% } else { %>
+                                    <form id="registerForm" action="/register/add" method="POST">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-                                <div class="form-section"
-                                    style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-                                    <h3>Participant Information</h3>
+                                        <div class="form-section"
+                                            style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+                                            <h3>Parent/Guardian Information</h3>
 
-                                    <div class="form-group">
-                                        <label class="form-label required">Participant Name | Nombre de Participante
-                                            <span style="color: red;">*</span></label>
-                                        <input type="text" name="participantname" class="form-control" required>
-                                    </div>
+                                            <div class="form-group">
+                                                <label class="form-label required">Parent/Guardian Name | Nombre del
+                                                    Padre/Madre/Tutor <span style="color: red;">*</span></label>
+                                                <input type="text" name="parentguardianname" class="form-control"
+                                                    required>
+                                            </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label required">Child's Date of Birth | Fecha de Nacimiento
-                                            de su
-                                            Hija <span style="color: red;">*</span></label>
-                                        <input type="date" name="participantdob" class="form-control" required>
-                                    </div>
+                                            <div class="form-group">
+                                                <label class="form-label required">Phone Number | Número de teléfono
+                                                    <span style="color: red;">*</span></label>
+                                                <input type="text" name="phone" class="form-control" required>
+                                            </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label required">Grade | Año Escolar <span
-                                                style="color: red;">*</span></label>
-                                        <input type="text" name="grade" class="form-control" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label required">What school does the student attend? | ¿A que
-                                            escuela asiste su hija? <span style="color: red;">*</span></label>
-                                        <input type="text" name="school" class="form-control" required>
-                                    </div>
-                                </div>
-
-                                <div class="form-section"
-                                    style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-                                    <h3>Program Selection</h3>
-
-                                    <div class="form-group">
-                                        <label class="form-label required">Which program(s) are you interested in
-                                            participating in?</label>
-                                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="checkbox" name="programinterest" value="Mariachi"
-                                                    style="width: auto;"> Mariachi
-                                            </label>
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="checkbox" name="programinterest" value="Ballet Folklorico"
-                                                    style="width: auto;"> Ballet Folklorico
-                                            </label>
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="checkbox" name="programinterest" value="Art"
-                                                    style="width: auto;"> Art | Arte
-                                            </label>
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="checkbox" name="programinterest" value="STEM"
-                                                    style="width: auto;"> STEM
-                                            </label>
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="checkbox" name="programinterest" value="Summer Day Camps"
-                                                    style="width: auto;"> Summer Day Camps | Campamentos de Verano
-                                            </label>
+                                            <div class="form-group">
+                                                <label class="form-label required">Parent Email Address | Correo
+                                                    electrónico de
+                                                    los
+                                                    padres <span style="color: red;">*</span></label>
+                                                <input type="email" name="email" class="form-control" required
+                                                    value="<%= (typeof user !== 'undefined' && user) ? user.email : '' %>"
+                                                    <%=(typeof user !=='undefined' && user)
+                                                    ? 'readonly style="background-color: #e9ecef;"' : '' %>>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">Regarding mariachi: which instrument is your daughter
-                                            interested in?</label>
-                                        <select name="mariachiinstrument" class="form-control">
-                                            <option value="">Select Instrument</option>
-                                            <option value="Violin">Violin</option>
-                                            <option value="Guitar">Guitar | Guitarra</option>
-                                            <option value="Trumpet">Trumpet | Trompeta</option>
-                                            <option value="Guitarron">Guitarron</option>
-                                            <option value="Vihuela">Vihuela</option>
-                                        </select>
-                                    </div>
+                                        <div class="form-section"
+                                            style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+                                            <h3>Participant Information</h3>
 
-                                    <div class="form-group">
-                                        <label class="form-label">If your daughter already plays a musical instrument,
-                                            what
-                                            does she play, and how long has she played it?</label>
-                                        <textarea name="instrumentexperience" class="form-control" rows="3"></textarea>
-                                    </div>
-                                </div>
+                                            <div class="form-group">
+                                                <label class="form-label required">Participant Name | Nombre de
+                                                    Participante
+                                                    <span style="color: red;">*</span></label>
+                                                <input type="text" name="participantname" class="form-control" required>
+                                            </div>
 
-                                <div class="form-section"
-                                    style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-                                    <h3>Fees & Scholarships</h3>
+                                            <div class="form-group">
+                                                <label class="form-label required">Child's Date of Birth | Fecha de
+                                                    Nacimiento
+                                                    de su
+                                                    Hija <span style="color: red;">*</span></label>
+                                                <input type="date" name="participantdob" class="form-control" required>
+                                            </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label required">Registration Fee / Scholarship Option <span
-                                                style="color: red;">*</span></label>
-                                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="radio" name="feestatus" value="Pay" style="width: auto;"
-                                                    required> Yes, we can pay the registration fee ($45).
-                                            </label>
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="radio" name="feestatus" value="Scholarship"
-                                                    style="width: auto;" required> I would like to apply for a
-                                                scholarship.
-                                            </label>
+                                            <div class="form-group">
+                                                <label class="form-label required">Grade | Año Escolar <span
+                                                        style="color: red;">*</span></label>
+                                                <input type="text" name="grade" class="form-control" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label required">What school does the student attend?
+                                                    | ¿A que
+                                                    escuela asiste su hija? <span style="color: red;">*</span></label>
+                                                <input type="text" name="school" class="form-control" required>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label
-                                            style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                            <input type="checkbox" name="tuitionagreement" style="width: auto;"
-                                                required>
-                                            I understand that there will be a monthly tuition fee of $35 after May 1st,
-                                            2026. <span style="color: red;">*</span>
-                                        </label>
-                                    </div>
-                                </div>
+                                        <div class="form-section"
+                                            style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+                                            <h3>Program Selection</h3>
 
-                                <div class="form-section">
-                                    <h3>Preferences & Consent</h3>
+                                            <div class="form-group">
+                                                <label class="form-label required">Which program(s) are you interested
+                                                    in
+                                                    participating in?</label>
+                                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="checkbox" name="programinterest" value="Mariachi"
+                                                            style="width: auto;"> Mariachi
+                                                    </label>
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="checkbox" name="programinterest"
+                                                            value="Ballet Folklorico" style="width: auto;"> Ballet
+                                                        Folklorico
+                                                    </label>
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="checkbox" name="programinterest" value="Art"
+                                                            style="width: auto;"> Art | Arte
+                                                    </label>
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="checkbox" name="programinterest" value="STEM"
+                                                            style="width: auto;"> STEM
+                                                    </label>
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="checkbox" name="programinterest"
+                                                            value="Summer Day Camps" style="width: auto;"> Summer Day
+                                                        Camps | Campamentos de Verano
+                                                    </label>
+                                                </div>
+                                            </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label required">Language Preference for Reminders <span
-                                                style="color: red;">*</span></label>
-                                        <select name="languagepreference" class="form-control" required>
-                                            <option value="English">English</option>
-                                            <option value="Spanish">Spanish</option>
-                                            <option value="No preference">No preference</option>
-                                            <option value="Other">Other Language</option>
-                                        </select>
-                                    </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Regarding mariachi: which instrument is your
+                                                    daughter
+                                                    interested in?</label>
+                                                <select name="mariachiinstrument" class="form-control">
+                                                    <option value="">Select Instrument</option>
+                                                    <option value="Violin">Violin</option>
+                                                    <option value="Guitar">Guitar | Guitarra</option>
+                                                    <option value="Trumpet">Trumpet | Trompeta</option>
+                                                    <option value="Guitarron">Guitarron</option>
+                                                    <option value="Vihuela">Vihuela</option>
+                                                </select>
+                                            </div>
 
-                                    <div class="form-group">
-                                        <label
-                                            style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                            <input type="checkbox" name="medicalconsent" style="width: auto;" required>
-                                            Emergency Medical Consent: I authorize Ella Rises Foundation to seek medical
-                                            attention if necessary. <span style="color: red;">*</span>
-                                        </label>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label required">Photo & Video Consent <span
-                                                style="color: red;">*</span></label>
-                                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="radio" name="photoconsent" value="on" style="width: auto;"
-                                                    required> Yes, I give permission.
-                                            </label>
-                                            <label
-                                                style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                                <input type="radio" name="photoconsent" value="off" style="width: auto;"
-                                                    required> No, I do not give permission.
-                                            </label>
+                                            <div class="form-group">
+                                                <label class="form-label">If your daughter already plays a musical
+                                                    instrument,
+                                                    what
+                                                    does she play, and how long has she played it?</label>
+                                                <textarea name="instrumentexperience" class="form-control"
+                                                    rows="3"></textarea>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label
-                                            style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
-                                            <input type="checkbox" name="liabilityrelease" style="width: auto;"
-                                                required>
-                                            Liability Release: I agree to the terms and release Ella Rises Foundation
-                                            from
-                                            liability. <span style="color: red;">*</span>
-                                        </label>
-                                    </div>
+                                        <div class="form-section"
+                                            style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+                                            <h3>Fees & Scholarships</h3>
 
-                                    <div class="form-group">
-                                        <label class="form-label required">Parent/Guardian Signature (Type Name) <span
-                                                style="color: red;">*</span></label>
-                                        <input type="text" name="parentsignature" class="form-control" required>
-                                    </div>
-                                </div>
+                                            <div class="form-group">
+                                                <label class="form-label required">Registration Fee / Scholarship Option
+                                                    <span style="color: red;">*</span></label>
+                                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="radio" name="feestatus" value="Pay"
+                                                            style="width: auto;" required> Yes, we can pay the
+                                                        registration fee ($45).
+                                                    </label>
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="radio" name="feestatus" value="Scholarship"
+                                                            style="width: auto;" required> I would like to apply for a
+                                                        scholarship.
+                                                    </label>
+                                                </div>
+                                            </div>
 
-                                <button type="submit" class="btn btn-primary"
-                                    style="width: 100%; margin-top: 2rem;">Submit
-                                    Registration</button>
-                            </form>
+                                            <div class="form-group">
+                                                <label
+                                                    style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                    <input type="checkbox" name="tuitionagreement" style="width: auto;"
+                                                        required>
+                                                    I understand that there will be a monthly tuition fee of $35 after
+                                                    May 1st,
+                                                    2026. <span style="color: red;">*</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-section">
+                                            <h3>Preferences & Consent</h3>
+
+                                            <div class="form-group">
+                                                <label class="form-label required">Language Preference for Reminders
+                                                    <span style="color: red;">*</span></label>
+                                                <select name="languagepreference" class="form-control" required>
+                                                    <option value="English">English</option>
+                                                    <option value="Spanish">Spanish</option>
+                                                    <option value="No preference">No preference</option>
+                                                    <option value="Other">Other Language</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label
+                                                    style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                    <input type="checkbox" name="medicalconsent" style="width: auto;"
+                                                        required>
+                                                    Emergency Medical Consent: I authorize Ella Rises Foundation to seek
+                                                    medical
+                                                    attention if necessary. <span style="color: red;">*</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label required">Photo & Video Consent <span
+                                                        style="color: red;">*</span></label>
+                                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="radio" name="photoconsent" value="on"
+                                                            style="width: auto;" required> Yes, I give permission.
+                                                    </label>
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                        <input type="radio" name="photoconsent" value="off"
+                                                            style="width: auto;" required> No, I do not give permission.
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label
+                                                    style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                                    <input type="checkbox" name="liabilityrelease" style="width: auto;"
+                                                        required>
+                                                    Liability Release: I agree to the terms and release Ella Rises
+                                                    Foundation
+                                                    from
+                                                    liability. <span style="color: red;">*</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label required">Parent/Guardian Signature (Type Name)
+                                                    <span style="color: red;">*</span></label>
+                                                <input type="text" name="parentsignature" class="form-control" required>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary"
+                                            style="width: 100%; margin-top: 2rem;">Submit
+                                            Registration</button>
+                                    </form>
+                                    <% } %>
                 </div>
 
                 <% if (user && user.role==='Manager' ) { %>
