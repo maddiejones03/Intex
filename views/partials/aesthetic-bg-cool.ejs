@@ -1,0 +1,53 @@
+<div class="aesthetic-bg-container">
+    <div class="layer bg-base-cool"></div>
+    <div class="layer bg-gradient-cool-1"></div>
+    <div class="layer bg-gradient-cool-2"></div>
+    <div class="layer bg-gradient-cool-3"></div>
+</div>
+
+<style>
+    .aesthetic-bg-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Base Layer: Cream to Light Blue */
+    .bg-base-cool {
+        background: linear-gradient(to bottom right, var(--bg-color), var(--accent-blue));
+        opacity: 0.8;
+    }
+
+    /* Layer 1: Soft Radial Glow (Green) - Top Left */
+    .bg-gradient-cool-1 {
+        background: radial-gradient(circle at 15% 25%, rgba(154, 181, 157, 0.4) 0%, rgba(154, 181, 157, 0) 60%);
+        /* accent-green */
+        mix-blend-mode: multiply;
+    }
+
+    /* Layer 2: Soft Radial Glow (Purple) - Bottom Right */
+    .bg-gradient-cool-2 {
+        background: radial-gradient(circle at 85% 75%, rgba(151, 142, 196, 0.4) 0%, rgba(151, 142, 196, 0) 55%);
+        /* accent-purple */
+        mix-blend-mode: multiply;
+    }
+
+    /* Layer 3: Subtle Accent (Blue) - Center/Random */
+    .bg-gradient-cool-3 {
+        background: radial-gradient(ellipse at 40% 60%, rgba(153, 183, 198, 0.3) 0%, rgba(153, 183, 198, 0) 70%);
+        /* accent-blue */
+        mix-blend-mode: overlay;
+    }
+</style>

@@ -1,110 +1,114 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
+        <%- include('partials/aesthetic-bg-cool') %>
 
-        <div class="container section" style="margin-top: 4rem;">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-                <div>
-                    <h1>Dashboard</h1>
-                    <span style="color: var(--text-secondary);">Welcome, <%= user.firstname %></span>
+            <div class="container section" style="margin-top: 4rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h1>Dashboard</h1>
+                        <span style="color: var(--text-secondary);">Welcome, <%= user.firstname %></span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="/participants" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage Participants</a>
+                        <a href="/events" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage
+                            Events</a>
+                        <a href="/organizations" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage Organizations</a>
+                        <a href="/grants" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage
+                            Grants</a>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <a href="/participants" class="btn btn-outline"
-                        style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage Participants</a>
-                    <a href="/events" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage
-                        Events</a>
-                    <a href="/organizations" class="btn btn-outline"
-                        style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage Organizations</a>
-                    <a href="/grants" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Manage
-                        Grants</a>
+
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <h3>Total Participants</h3>
+                        <p class="number">
+                            <%= participants.length %>
+                        </p>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>Events This Year</h3>
+                        <p class="number">
+                            <%= events.length %>
+                        </p>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>Avg Satisfaction</h3>
+                        <p class="number">
+                            <%= avgSatisfaction %>/5
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class='tableauPlaceholder' id='viz1764722403598' style='position: relative'><noscript><a
+                                href='#'><img alt='Dashboard 1 '
+                                    src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;Dashboard1&#47;1_rss.png'
+                                    style='border: none' /></a></noscript><object class='tableauViz'
+                            style='display:none;'>
+                            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                            <param name='embed_code_version' value='3' />
+                            <param name='site_root' value='' />
+                            <param name='name' value='INTEXTableau&#47;Dashboard1' />
+                            <param name='tabs' value='no' />
+                            <param name='toolbar' value='yes' />
+                            <param name='static_image'
+                                value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;Dashboard1&#47;1.png' />
+                            <param name='animate_transition' value='yes' />
+                            <param name='display_static_image' value='yes' />
+                            <param name='display_spinner' value='yes' />
+                            <param name='display_overlay' value='yes' />
+                            <param name='display_count' value='yes' />
+                            <param name='language' value='en-US' />
+                        </object></div>
+                    <script
+                        type='text/javascript'>                    var divElement = document.getElementById('viz1764722403598'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '827px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="card stat-card">
-                    <h3>Total Participants</h3>
-                    <p class="number">
-                        <%= participants.length %>
-                    </p>
-                </div>
-                <div class="card stat-card">
-                    <h3>Events This Year</h3>
-                    <p class="number">
-                        <%= events.length %>
-                    </p>
-                </div>
-                <div class="card stat-card">
-                    <h3>Avg Satisfaction</h3>
-                    <p class="number">
-                        <%= avgSatisfaction %>/5
-                    </p>
-                </div>
-            </div>
+            <script>
+                const ctx = document.getElementById('impactChart').getContext('2d');
+                Chart.defaults.color = '#999999';
+                Chart.defaults.borderColor = '#333333';
 
-            <div class="card">
-                <div class='tableauPlaceholder' id='viz1764722403598' style='position: relative'><noscript><a
-                            href='#'><img alt='Dashboard 1 '
-                                src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;Dashboard1&#47;1_rss.png'
-                                style='border: none' /></a></noscript><object class='tableauViz' style='display:none;'>
-                        <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
-                        <param name='embed_code_version' value='3' />
-                        <param name='site_root' value='' />
-                        <param name='name' value='INTEXTableau&#47;Dashboard1' />
-                        <param name='tabs' value='no' />
-                        <param name='toolbar' value='yes' />
-                        <param name='static_image'
-                            value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;Dashboard1&#47;1.png' />
-                        <param name='animate_transition' value='yes' />
-                        <param name='display_static_image' value='yes' />
-                        <param name='display_spinner' value='yes' />
-                        <param name='display_overlay' value='yes' />
-                        <param name='display_count' value='yes' />
-                        <param name='language' value='en-US' />
-                    </object></div>
-                <script
-                    type='text/javascript'>                    var divElement = document.getElementById('viz1764722403598'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '827px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
-            </div>
-        </div>
-
-        <script>
-            const ctx = document.getElementById('impactChart').getContext('2d');
-            Chart.defaults.color = '#999999';
-            Chart.defaults.borderColor = '#333333';
-
-            const impactChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Students Interested',
-                        data: [65, 72, 78, 85, 90, 95],
-                        borderColor: '#FFFFFF',
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+                const impactChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Students Interested',
+                            data: [65, 72, 78, 85, 90, 95],
+                            borderColor: '#FFFFFF',
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                        }]
                     },
-                    scales: {
-                        y: {
-                            grid: {
-                                color: '#333333'
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         },
-                        x: {
-                            grid: {
-                                display: false
+                        scales: {
+                            y: {
+                                grid: {
+                                    color: '#333333'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
                             }
                         }
                     }
-                }
-            });
-        </script>
+                });
+            </script>
 
-        <%- include('partials/footer') %>
+            <%- include('partials/footer') %>

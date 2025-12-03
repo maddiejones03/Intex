@@ -1,82 +1,93 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
+        <%- include('partials/aesthetic-bg') %>
 
-        <div class="container section" style="margin-top: 4rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1>Participants</h1>
-                <% if (user && user.role==='Manager' ) { %>
-                    <button onclick="openAddModal()" class="btn btn-primary">Add Participant</button>
-                    <% } %>
-            </div>
+            <div class="container section" style="margin-top: 4rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1>Participants</h1>
+                    <% if (user && user.role==='Manager' ) { %>
+                        <button onclick="openAddModal()" class="btn btn-primary">Add Participant</button>
+                        <% } %>
+                </div>
 
-            <!-- Search Form -->
-            <form action="/participants" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" placeholder="Search by name or email..."
-                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
-                <button type="submit" class="btn btn-outline">Search</button>
-                <% if (typeof search !=='undefined' && search) { %>
-                    <a href="/participants" class="btn btn-outline">Clear</a>
-                    <% } %>
-            </form>
+                <!-- Search Form -->
+                <form action="/participants" method="GET"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;">
+                    <div class="aesthetic-search">
+                        <input type="text" name="search" placeholder="Search by name or email..."
+                            value="<%= typeof search !== 'undefined' ? search : '' %>">
+                        <button type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <% if (typeof search !=='undefined' && search) { %>
+                        <a href="/participants" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; text-decoration: none; border-radius: 50px;">Clear</a>
+                        <% } %>
+                </form>
 
-            <!-- Participants Table -->
-            <div class="card">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
-                            <th style="padding: 1rem;">Name</th>
-                            <th style="padding: 1rem;">Email</th>
-                            <th style="padding: 1rem;">Phone</th>
-                            <th style="padding: 1rem;">City/State</th>
-                            <th style="padding: 1rem;">DOB</th>
-                            <% if (user && user.role==='Manager' ) { %>
-                                <th style="padding: 1rem;">Actions</th>
-                                <% } %>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% participants.forEach(p=> { %>
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 1rem;">
-                                    <a href="/participants/<%= p.participantid %>"
+                <!-- Participants Table -->
+                <div class="card" style="padding: 0; overflow: hidden; border: none; background: transparent;">
+                    <table class="aesthetic-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>City/State</th>
+                                <th>DOB</th>
+                                <% if (user && user.role==='Manager' ) { %>
+                                    <th>Actions</th>
+                                    <% } %>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% participants.forEach(p=> { %>
+                                <tr>
+                                    <td>
+                                        <a href="/participants/<%= p.participantid %>"
                                         style="text-decoration: none; color: inherit; font-weight: bold;">
                                         <%= p.participantfirstname %>
                                             <%= p.participantlastname %>
-                                    </a>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= p.participantemail %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= p.participantphone %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= p.participantcity %>, <%= p.participantstate %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= new Date(p.participantdob).toLocaleDateString() %>
-                                </td>
-                                <% if (user && user.role==='Manager' ) { %>
-                                    <td style="padding: 1rem;">
-                                        <div style="display: flex; gap: 0.5rem;">
-                                            <a href="/participants/<%= p.participantid %>" class="btn btn-outline"
-                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; text-decoration: none;">Edit</a>
-                                            <form action="/participants/delete/<%= p.participantid %>" method="POST"
-                                                onsubmit="return confirm('Are you sure? This will delete all associated donations and milestones.');"
-                                                style="display: inline;">
-                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                                <button type="submit" class="btn btn-primary"
-                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
-                                            </form>
-                                        </div>
                                     </td>
-                                    <% } %>
-                            </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
+                                    <td>
+                                        <%= p.participantemail %>
+                                    </td>
+                                    <td>
+                                        <%= p.participantphone %>
+                                    </td>
+                                    <td>
+                                        <%= p.participantcity %>, <%= p.participantstate %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(p.participantdob).toLocaleDateString() %>
+                                    </td>
+                                    <% if (user && user.role==='Manager' ) { %>
+                                        <td>
+                                            <div style="display: flex; gap: 0.5rem;">
+                                                <button onclick="openEditModal('<%= p.participantid %>')"
+                                                    class="btn btn-outline"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px;">Edit</button>
+                                                <form action="/participants/delete/<%= p.participantid %>" method="POST"
+                                                    onsubmit="return confirm('Are you sure? This will delete all associated donations and milestones.');"
+                                                    style="display: inline;">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                    <button type="submit" class="btn btn-primary"
+                                                        style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444; border-radius: 20px;">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                        <% } %>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
         <!-- Add Participant Modal -->
         <div id="addParticipantModal" class="modal"
@@ -202,17 +213,47 @@
             </div>
         </div>
 
-        <script>
-            function openAddModal() {
-                document.getElementById('addParticipantModal').style.display = 'block';
-            }
+            <script>
+                const participantsData = <% - JSON.stringify(participants) %>;
 
-            // Close modal if clicked outside
-            window.onclick = function (event) {
-                if (event.target == document.getElementById('addParticipantModal')) {
-                    document.getElementById('addParticipantModal').style.display = 'none';
+                function openModal() {
+                    document.getElementById('participantModal').style.display = 'block';
+                    document.getElementById('modalTitle').innerText = 'Add Participant';
+                    document.getElementById('participantForm').action = '/participants/add';
+                    document.getElementById('participantForm').reset();
                 }
-            }
-        </script>
 
-        <%- include('partials/footer') %>
+                function closeModal() {
+                    document.getElementById('participantModal').style.display = 'none';
+                }
+
+                function editParticipant(id) {
+                    const p = participantsData.find(p => p.participantid == id);
+                    if (!p) return;
+
+                    document.getElementById('participantModal').style.display = 'block';
+                    document.getElementById('modalTitle').innerText = 'Edit Participant';
+                    document.getElementById('participantForm').action = `/participants/edit/${p.participantid}`;
+
+                    const form = document.getElementById('participantForm');
+                    form.participantfirstname.value = p.participantfirstname;
+                    form.participantlastname.value = p.participantlastname;
+                    form.participantemail.value = p.participantemail;
+                    form.participantphone.value = p.participantphone || '';
+                    form.participantaddress.value = p.participantaddress || '';
+                    form.participantcity.value = p.participantcity || '';
+                    form.participantstate.value = p.participantstate || '';
+                    form.participantzip.value = p.participantzip || '';
+                    form.participantdateofbirth.value = p.participantdateofbirth ? p.participantdateofbirth.split('T')[0] : '';
+                    form.participantgender.value = p.participantgender || '';
+                }
+
+                // Close modal if clicked outside
+                window.onclick = function (event) {
+                    if (event.target == document.getElementById('addParticipantModal')) {
+                        document.getElementById('addParticipantModal').style.display = 'none';
+                    }
+                }
+            </script>
+
+            <%- include('partials/footer') %>

@@ -392,10 +392,17 @@ footer {
     transition: opacity 1s ease-in-out;
     background-size: cover;
     background-position: center;
+    pointer-events: none;
+    /* Ignore clicks when invisible */
+    z-index: 0;
 }
 
 .carousel-slide.active {
     opacity: 1;
+    pointer-events: auto;
+    /* Enable clicks when visible */
+    z-index: 1;
+    /* Bring to front */
 }
 
 .carousel-overlay {
@@ -420,6 +427,11 @@ footer {
     font-size: 5rem;
     margin-bottom: 1.5rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    min-height: 2.2em;
+    /* Reserve space for 2 lines */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
 
 .carousel-content p {
@@ -428,6 +440,24 @@ footer {
     max-width: 800px;
     margin: 0 auto 2rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    min-height: 4.5em;
+    /* Reserve space for ~3 lines */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.btn-hero-outline {
+    background-color: transparent;
+    border: 2px solid #FFFFFF;
+    color: #FFFFFF;
+    margin-left: 1rem;
+}
+
+.btn-hero-outline:hover {
+    background-color: #FFFFFF !important;
+    color: var(--accent-color) !important;
+    border-color: #FFFFFF !important;
 }
 
 /* Signature Programs Section */
@@ -1306,4 +1336,100 @@ footer {
     font-size: 0.95rem;
     color: var(--text-secondary);
     line-height: 1.5;
+}
+
+/* Aesthetic Table */
+.aesthetic-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.aesthetic-table thead tr {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-bottom: 2px solid var(--accent-light-pink);
+}
+
+.aesthetic-table th {
+    padding: 1.2rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+.aesthetic-table tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.aesthetic-table tbody tr:last-of-type {
+    border-bottom: none;
+}
+
+.aesthetic-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.aesthetic-table td {
+    padding: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Aesthetic Search Bar */
+.aesthetic-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+.aesthetic-search input {
+    width: 100%;
+    padding: 0.8rem 3rem 0.8rem 1.2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    background-color: #FFFFFF;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.aesthetic-search input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 15px rgba(206, 50, 91, 0.1);
+}
+
+.aesthetic-search button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.aesthetic-search button:hover {
+    background-color: rgba(206, 50, 91, 0.1);
+}
+
+.aesthetic-search button svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent-color);
 }
