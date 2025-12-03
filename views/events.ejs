@@ -29,21 +29,25 @@
                                     </div>
                                     <div class="card-footer"
                                         style="margin-top: auto; padding-top: 1rem; border-top: 1px solid #eee;">
-                                        <% if (registeredEventIds.includes(event.eventoccurrenceid)) { %>
-                                            <button class="btn btn-outline" disabled
-                                                style="width: 100%; cursor: default; opacity: 0.7;">Registered</button>
-                                            <% } else if (participant) { %>
-                                                <form action="/events/register/<%= event.eventoccurrenceid %>"
-                                                    method="POST">
-                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                                    <button type="submit" class="btn btn-primary"
-                                                        style="width: 100%;">Register</button>
-                                                </form>
-                                                <% } else { %>
-                                                    <a href="/register" class="btn btn-primary"
-                                                        style="width: 100%; text-align: center;">Register (Requires
-                                                        Participant Account)</a>
-                                                    <% } %>
+                                        <% if (user && user.role==='Manager' ) { %>
+                                            <a href="/events/<%= event.eventoccurrenceid %>/participants"
+                                                class="btn btn-primary"
+                                                style="width: 100%; text-align: center;">Registered Participants</a>
+                                            <% } else if (registeredEventIds.includes(event.eventoccurrenceid)) { %>
+                                                <button class="btn btn-outline" disabled
+                                                    style="width: 100%; cursor: default; opacity: 0.7;">Registered</button>
+                                                <% } else if (participant) { %>
+                                                    <form action="/events/register/<%= event.eventoccurrenceid %>"
+                                                        method="POST">
+                                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                        <button type="submit" class="btn btn-primary"
+                                                            style="width: 100%;">Register</button>
+                                                    </form>
+                                                    <% } else { %>
+                                                        <a href="/register" class="btn btn-primary"
+                                                            style="width: 100%; text-align: center;">Register (Requires
+                                                            Participant Account)</a>
+                                                        <% } %>
                                     </div>
                                 </div>
                                 <% }) %>

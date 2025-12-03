@@ -111,6 +111,61 @@
                             <% } %>
                 </div>
             </div>
+
+            <!-- Surveys Section -->
+            <div class="card" style="margin-top: 2rem;">
+                <h2>Completed Surveys</h2>
+                <% if (surveys && surveys.length> 0) { %>
+                    <div style="overflow-x: auto;">
+                        <table class="aesthetic-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Satisfaction</th>
+                                    <th>Usefulness</th>
+                                    <th>Instructor</th>
+                                    <th>Recommend</th>
+                                    <th>Overall</th>
+                                    <th>NPS Bucket</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% surveys.forEach(s=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= new Date(s.surveysubmissiondate).toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <%= s.surveysatisfactionscore %>/5
+                                        </td>
+                                        <td>
+                                            <%= s.surveyusefulnessscore %>/5
+                                        </td>
+                                        <td>
+                                            <%= s.surveyinstructorscore %>/5
+                                        </td>
+                                        <td>
+                                            <%= s.surveyrecommendationscore %>/5
+                                        </td>
+                                        <td>
+                                            <%= s.surveyoverallscore %>
+                                        </td>
+                                        <td>
+                                            <%= s.surveynpsbucket %>
+                                        </td>
+                                        <td>
+                                            <%= s.surveycomments || 'N/A' %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } else { %>
+                        <p>No surveys completed.</p>
+                        <% } %>
+            </div>
         </div>
 
         <!-- Edit Profile Modal -->
