@@ -184,18 +184,25 @@
             <script src="/js/carousel.js"></script>
         </div>
 
-        <div class="container section">
-
-            <div class="section" style="text-align: center; margin-top: 4rem;">
-                <h2>Join Our Movement</h2>
-                <p>Whether you are a student, a professional, or a supporter, there is a place for you at Ella Rises.
-                </p>
-                <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+        <div class="container section mission-video-section">
+            <div class="mission-text">
+                <h2>Our Mission</h2>
+                <p>Empowering young women to pursue higher education through high-impact multicultural activities
+                    focused on mariachi and STEAM.</p>
+                <div class="mission-buttons">
                     <a href="/donate" class="btn btn-primary">Donate Now</a>
                     <% if (!user) { %>
                         <a href="/login" class="btn btn-outline">Join Us</a>
                         <% } %>
                 </div>
+            </div>
+            <div class="mission-video">
+                <video controls width="100%" style="border-radius: 16px;">
+                    <source
+                        src="https://video.wixstatic.com/video/e5f869_f075e19ca2744354bb20a65881dce28f/1080p/mp4/file.mp4"
+                        type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </div>
         </div>
 

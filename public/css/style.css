@@ -495,7 +495,7 @@ footer {
 /* Donation Page Styles */
 .donation-split {
     display: flex;
-    min-height: 100vh;
+    min-height: 95vh;
     padding-top: 76px;
     /* Header height */
 }
@@ -505,16 +505,29 @@ footer {
     background-color: #F9E0D9;
     /* Pink background */
     display: flex;
+    flex-direction: row;
+    /* Side by side */
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
+    /* Match height */
     padding: 2rem;
 }
 
 .donation-image-container img {
-    max-width: 50%;
-    /* Smaller image */
+    width: 55%;
+    max-width: 500px;
+    /* Wider image */
     height: auto;
+    min-height: 90%;
+    /* Ensure it fills height */
+    border-radius: 16px 0 0 16px;
+    /* Left rounded, right sharp */
+    margin-bottom: 0;
+    display: block;
+    /* Remove inline gap */
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+    object-fit: cover;
+    /* Fill space */
 }
 
 .donation-form-container {
@@ -1181,4 +1194,116 @@ footer {
 .animate-on-scroll.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Mission Video Section */
+.mission-video-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 4rem 0;
+}
+
+.mission-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.mission-text p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+}
+
+.mission-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 900px) {
+    .mission-video-section {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .mission-buttons {
+        justify-content: center;
+    }
+}
+
+/* Registered Button State */
+.register-btn.registered {
+    background-color: #ccc !important;
+    color: #666 !important;
+    border-color: #ccc !important;
+    cursor: default !important;
+}
+
+.register-btn.registered:hover {
+    background-color: #ccc !important;
+    transform: none !important;
+}
+
+/* Campaign Info Card */
+.campaign-info-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0 16px 16px 0;
+    /* Left sharp, right rounded */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 0;
+    /* Remove gap */
+    width: 45%;
+    max-width: 400px;
+    text-align: left;
+}
+
+.campaign-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+}
+
+.raised-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.goal-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background-color: #F0F0F0;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #9AB59D;
+    /* Sage green from screenshot */
+    border-radius: 6px;
+}
+
+.campaign-info-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.campaign-info-card p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
 }
