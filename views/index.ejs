@@ -14,8 +14,7 @@
                                 style="margin-left: 1rem; border-color: #FFF; color: #FFF;">Donate Now</a>
                         </div>
                         <div style="margin-top: 2rem;">
-                            <a href="/enroll"
-                                class="enroll-btn">Click here to enroll</a>
+                            <a href="/enroll" class="enroll-btn">Click here to enroll</a>
                         </div>
                     </div>
                 </div>
@@ -31,8 +30,7 @@
                                 style="margin-left: 1rem; border-color: #FFF; color: #FFF;">Donate Now</a>
                         </div>
                         <div style="margin-top: 2rem;">
-                            <a href="/enroll"
-                                class="enroll-btn">Click here to enroll</a>
+                            <a href="/enroll" class="enroll-btn">Click here to enroll</a>
                         </div>
                     </div>
                 </div>
@@ -48,8 +46,7 @@
                                 style="margin-left: 1rem; border-color: #FFF; color: #FFF;">Donate Now</a>
                         </div>
                         <div style="margin-top: 2rem;">
-                            <a href="/enroll"
-                                class="enroll-btn">Click here to enroll</a>
+                            <a href="/enroll" class="enroll-btn">Click here to enroll</a>
                         </div>
                     </div>
                 </div>
@@ -73,13 +70,59 @@
         <section class="signature-programs">
             <div class="container">
                 <div class="signature-content">
+                    <div class="signature-visuals">
+                        <div class="signature-static-image">
+                            <img src="/images/ella.jpg" alt="Empowering Women" class="animate-on-scroll"
+                                style="width: 100%; border-radius: 0; margin-bottom: 2rem;">
+                        </div>
+
+                        <!-- New Carousel for Signature Section -->
+                        <div class="team-carousel-container carousel-container-js" style="margin-top: 0;">
+                            <button class="carousel-button prev" aria-label="Previous Slide"
+                                style="background: rgba(0,0,0,0.5); color: white;">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                                </svg>
+                            </button>
+                            <div class="carousel-track-container">
+                                <div class="carousel-track">
+                                    <div class="team-card-carousel"><img src="/images/stem.jpeg" alt="Program Image 1"
+                                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 0;">
+                                    </div>
+                                    <div class="team-card-carousel"><img src="/images/papas.jpeg" alt="Program Image 2"
+                                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 0;">
+                                    </div>
+                                    <div class="team-card-carousel"><img src="/images/trompeta.jpeg"
+                                            alt="Program Image 3"
+                                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 0;">
+                                    </div>
+                                    <div class="team-card-carousel"><img src="/images/mascara.jpg" alt="Program Image 4"
+                                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 0;">
+                                    </div>
+                                    <div class="team-card-carousel"><img src="/images/baile.jpeg" alt="Program Image 5"
+                                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 0;">
+                                    </div>
+                                    <div class="team-card-carousel"><img src="/images/aprendiendo.jpeg"
+                                            alt="Program Image 6"
+                                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 0;">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="carousel-button next" aria-label="Next Slide"
+                                style="background: rgba(0,0,0,0.5); color: white;">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                     <div class="signature-text">
                         <h2>Empowering the future generation of women.</h2>
                         <p>Our signature programs and the Ella Rises Summit serve over 150 young women each year!</p>
-                        <a href="/donate" class="btn btn-primary">Donate</a>
-                    </div>
-                    <div class="signature-image">
-                        <img src="/images/mariposa_naranja.png" alt="Mariposa Naranja - Ella Rises">
+                        <div class="signature-buttons">
+                            <a href="/donate" class="btn btn-primary">Donate</a>
+                            <a href="/enroll" class="btn btn-outline">Enroll</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -87,17 +130,26 @@
 
         <div class="container section">
             <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-                <div class="card">
+                <div class="card mission-card">
+                    <div class="icon-container">
+                        <img src="/images/captus.avif" alt="Butterfly Icon">
+                    </div>
                     <h3>Our Mission</h3>
                     <p>To inspire confidence and leadership in female youth through hands-on learning and cultural
                         pride.</p>
                 </div>
-                <div class="card">
+                <div class="card mission-card">
+                    <div class="icon-container">
+                        <img src="/images/flor.avif" alt="Cactus Icon">
+                    </div>
                     <h3>Our Impact</h3>
                     <p>Over 500 students served across Utah county with 95% reporting increased interest in higher
                         education.</p>
                 </div>
-                <div class="card">
+                <div class="card mission-card">
+                    <div class="icon-container">
+                        <img src="/images/mariposita.avif" alt="Flower Icon">
+                    </div>
                     <h3>Get Involved</h3>
                     <p>Join us as a mentor, volunteer, or donor to help shape the next generation of leaders.</p>
                 </div>
@@ -130,4 +182,6 @@
             </div>
         </div>
 
+        <script src="/js/carousel.js"></script>
+        <script src="/js/animations.js"></script>
         <%- include('partials/footer') %>
