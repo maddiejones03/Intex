@@ -261,12 +261,14 @@ app.get('/participants/:id', checkManager, async (req, res) => {
             .select('event_templates.eventname', 'event_occurrences.eventdatetimestart');
 
         const milestones = await db('milestones').where({ participantid: id }).orderBy('milestonedate', 'desc');
+        const surveys = await db('surveys').where({ participantid: id }).orderBy('surveysubmissiondate', 'desc');
 
         res.render('participant_detail', {
             title: `${participant.participantfirstname} ${participant.participantlastname}`,
             participant,
             events,
             milestones,
+            surveys,
             user: req.session.user,
             csrfToken: res.locals.csrfToken
         });
@@ -1075,6 +1077,32 @@ app.post('/enroll/delete/:id', checkManager, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Error deleting enrollment');
+    }
+});
+
+app.get('/events/:id/participants', checkManager, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const event = await db('event_occurrences')
+            .join('event_templates', 'event_occurrences.eventtemplateid', 'event_templates.eventtemplateid')
+            .where('event_occurrences.eventoccurrenceid', id)
+            .select('event_templates.eventname', 'event_occurrences.eventdatetimestart')
+            .first();
+
+        const participants = await db('registrations')
+            .join('participants', 'registrations.participantid', 'participants.participantid')
+            .where('registrations.eventoccurrenceid', id)
+            .select('participants.*', 'registrations.registrationstatus');
+
+        res.render('event_participants', {
+            title: `Participants for ${event.eventname}`,
+            event,
+            participants,
+            user: req.session.user
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error retrieving event participants');
     }
 });
 
