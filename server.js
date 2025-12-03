@@ -989,11 +989,15 @@ app.get('/register', async (req, res) => {
         // Only managers see the list, but we are removing enrollments table.
         // Maybe we should show participants list here for managers?
         // For now, just render the form.
+        // Check if user is already a participant
+        const alreadyRegistered = req.session.user && req.session.user.isParticipant;
+
         res.render('register', {
             title: 'Register',
             user: req.session.user,
             enrollments: [], // No longer used
-            csrfToken: res.locals.csrfToken
+            csrfToken: res.locals.csrfToken,
+            alreadyRegistered
         });
     } catch (err) {
         console.error(err);
@@ -1009,9 +1013,15 @@ app.post('/register/add', async (req, res) => {
         photoconsent, liabilityrelease, parentsignature
     } = req.body;
 
+    // Force email to match session user if logged in
+    let finalEmail = email;
+    if (req.session.user) {
+        finalEmail = req.session.user.email;
+    }
+
     try {
         // Check if participant exists (case-insensitive)
-        let participant = await db('participants').where('participantemail', 'ilike', email).first();
+        let participant = await db('participants').where('participantemail', 'ilike', finalEmail).first();
 
         // Check if there is a logged in user to link
         const user = req.session.user;
@@ -1026,7 +1036,7 @@ app.post('/register/add', async (req, res) => {
             await db('participants').insert({
                 participantfirstname: firstName,
                 participantlastname: lastName,
-                participantemail: email,
+                participantemail: finalEmail,
                 participantphone: phone,
                 participantdob: participantdob,
                 participantschooloremployer: school,
