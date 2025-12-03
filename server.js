@@ -34,6 +34,40 @@ app.use((req, res, next) => {
     next();
 });
 
+// Middleware to ensure isParticipant is set in session
+app.use(async (req, res, next) => {
+    if (req.session.user) {
+        // Always check to ensure we have the latest status, or at least if it's undefined
+        if (req.session.user.isParticipant === undefined) {
+            try {
+                let participant = null;
+                // First check by userid if we have it
+                if (req.session.user.userid) {
+                    participant = await db('participants').where('userid', req.session.user.userid).first();
+                }
+
+                // If not found by userid, check by email
+                if (!participant && req.session.user.email) {
+                    participant = await db('participants').where('participantemail', 'ilike', req.session.user.email.trim()).first();
+                }
+
+                req.session.user.isParticipant = !!participant;
+
+                // Also link userid if missing and we found by email
+                if (participant && !participant.userid) {
+                    await db('participants').where({ participantid: participant.participantid }).update({ userid: req.session.user.userid });
+                }
+                console.log(`Middleware: Checked participant for ${req.session.user.email}. Found: ${!!participant}. isParticipant set to: ${req.session.user.isParticipant}`);
+            } catch (err) {
+                console.error("Error checking participant status in middleware", err);
+            }
+        }
+        // Make user available to all views via locals (optional but good practice)
+        res.locals.user = req.session.user;
+    }
+    next();
+});
+
 // Auth Middleware
 const checkAuth = (req, res, next) => {
     if (req.session.user) {
@@ -100,11 +134,17 @@ app.post('/login', async (req, res) => {
         if (user && await bcrypt.compare(password, user.password)) {
             req.session.user = user;
 
-            // Link participant if exists and not linked
-            const participant = await db('participants').where({ participantemail: email }).first();
-            if (participant && !participant.userid) {
-                await db('participants').where({ participantid: participant.participantid }).update({ userid: user.userid });
+            const participant = await db('participants').where('participantemail', 'ilike', email).first();
+            console.log(`Login: Checking participant for ${email}. Found:`, participant);
+            if (participant) {
+                if (!participant.userid) {
+                    await db('participants').where({ participantid: participant.participantid }).update({ userid: user.userid });
+                }
+                req.session.user.isParticipant = true;
+            } else {
+                req.session.user.isParticipant = false;
             }
+            console.log(`Login: isParticipant set to ${req.session.user.isParticipant}`);
 
             const redirectUrl = req.session.returnTo || '/';
             delete req.session.returnTo;
@@ -145,9 +185,14 @@ app.post('/signup', async (req, res) => {
         req.session.user = newUser;
 
         // Link participant if exists
-        const participant = await db('participants').where({ participantemail: email }).first();
-        if (participant && !participant.userid) {
-            await db('participants').where({ participantid: participant.participantid }).update({ userid: newUser.userid });
+        const participant = await db('participants').where('participantemail', 'ilike', email).first();
+        if (participant) {
+            if (!participant.userid) {
+                await db('participants').where({ participantid: participant.participantid }).update({ userid: newUser.userid });
+            }
+            req.session.user.isParticipant = true;
+        } else {
+            req.session.user.isParticipant = false;
         }
 
         const redirectUrl = req.session.returnTo || '/';
@@ -186,7 +231,7 @@ app.get('/dashboard', checkManager, async (req, res) => {
 });
 
 // Participants Routes
-app.get('/participants', checkAuth, async (req, res) => {
+app.get('/participants', checkManager, async (req, res) => {
     const { search } = req.query;
     try {
         let query = db('participants').select('*');
@@ -204,15 +249,46 @@ app.get('/participants', checkAuth, async (req, res) => {
     }
 });
 
+app.get('/participants/:id', checkManager, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const participant = await db('participants').where({ participantid: id }).first();
+        if (!participant) {
+            return res.status(404).send('Participant not found');
+        }
+
+        const events = await db('registrations')
+            .join('event_occurrences', 'registrations.eventoccurrenceid', 'event_occurrences.eventoccurrenceid')
+            .join('event_templates', 'event_occurrences.eventtemplateid', 'event_templates.eventtemplateid')
+            .where('registrations.participantid', id)
+            .select('event_templates.eventname', 'event_occurrences.eventdatetimestart');
+
+        const milestones = await db('milestones').where({ participantid: id }).orderBy('milestonedate', 'desc');
+
+        res.render('participant_detail', {
+            title: `${participant.participantfirstname} ${participant.participantlastname}`,
+            participant,
+            events,
+            milestones,
+            user: req.session.user,
+            csrfToken: res.locals.csrfToken
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
 app.post('/participants/add', checkManager, async (req, res) => {
-    const { participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdateofbirth, participantgender } = req.body;
+    const { participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdateofbirth, participantdob, participantgender } = req.body;
     try {
         // Check for existing user to link
         const user = await db('users').where({ email: participantemail }).first();
         const userid = user ? user.userid : null;
 
         await db('participants').insert({
-            participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdob: participantdateofbirth, participantgender,
+            participantfirstname, participantlastname, participantemail, participantphone, participantcity, participantstate, participantzip,
+            participantdob: participantdob || participantdateofbirth,
             userid: userid
         });
         res.redirect('/participants');
@@ -224,12 +300,13 @@ app.post('/participants/add', checkManager, async (req, res) => {
 
 app.post('/participants/edit/:id', checkManager, async (req, res) => {
     const { id } = req.params;
-    const { participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdateofbirth, participantgender } = req.body;
+    const { participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdateofbirth, participantdob, participantgender, returnTo } = req.body;
     try {
         await db('participants').where({ participantid: id }).update({
-            participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdateofbirth, participantgender
+            participantfirstname, participantlastname, participantemail, participantphone, participantcity, participantstate, participantzip,
+            participantdob: participantdob || participantdateofbirth
         });
-        res.redirect('/participants');
+        res.redirect(returnTo || '/participants');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error updating participant');
@@ -430,7 +507,7 @@ app.post('/users/delete/:id', checkManager, async (req, res) => {
 });
 
 // Surveys Routes
-app.get('/surveys', checkAuth, async (req, res) => {
+app.get('/surveys', checkManager, async (req, res) => {
     const { search } = req.query;
     try {
         let query = db("surveys")
@@ -509,6 +586,22 @@ app.get('/milestones', checkAuth, async (req, res) => {
                 .orWhere('participants.participantfirstname', 'ilike', `%${search}%`)
                 .orWhere('participants.participantlastname', 'ilike', `%${search}%`);
         }
+
+        // Restrict to own milestones if not Manager
+        if (req.session.user.role !== 'Manager') {
+            if (!req.session.user.isParticipant) {
+                return res.status(403).send('Access Denied: Participants Only');
+            }
+            // Get participant ID for this user
+            const participant = await db('participants').where({ userid: req.session.user.userid }).first();
+            if (participant) {
+                query = query.where('milestones.participantid', participant.participantid);
+            } else {
+                // Should not happen if isParticipant is true, but safe fallback
+                return res.render('milestones', { title: 'Milestones', milestones: [], participants: [], user: req.session.user, search });
+            }
+        }
+
         const milestones = await query;
         const participants = await db('participants').select('participantid', 'participantfirstname', 'participantlastname');
 
@@ -520,14 +613,14 @@ app.get('/milestones', checkAuth, async (req, res) => {
 });
 
 app.post('/milestones/add', checkManager, async (req, res) => {
-    const { participantid, milestonetitle, milestonedate } = req.body;
+    const { participantid, milestonetitle, milestonedate, returnTo } = req.body;
     try {
         await db('milestones').insert({
             participantid: participantid || null,
             milestonetitle,
             milestonedate
         });
-        res.redirect('/milestones');
+        res.redirect(returnTo || '/milestones');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error adding milestone');
@@ -536,14 +629,29 @@ app.post('/milestones/add', checkManager, async (req, res) => {
 
 app.post('/milestones/edit/:id', checkManager, async (req, res) => {
     const { id } = req.params;
-    const { participantid, milestonetitle, milestonedate } = req.body;
+    const { participantid, milestonetitle, milestonedate, returnTo } = req.body;
     try {
+        // If participantid is not provided (e.g. from detail page modal), get it from existing milestone
+        let pid = participantid;
+        if (!pid) {
+            const m = await db('milestones').where({ milestoneid: id }).first();
+            pid = m ? m.participantid : null;
+        }
+
         await db('milestones').where({ milestoneid: id }).update({
-            participantid: participantid || null,
+            participantid: pid,
             milestonetitle,
             milestonedate
         });
-        res.redirect('/milestones');
+
+        // If returnTo is not set, try to redirect back to participant detail if we have the ID
+        if (returnTo) {
+            res.redirect(returnTo);
+        } else if (pid) {
+            res.redirect(`/participants/${pid}`);
+        } else {
+            res.redirect('/milestones');
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send('Error updating milestone');
@@ -552,9 +660,10 @@ app.post('/milestones/edit/:id', checkManager, async (req, res) => {
 
 app.post('/milestones/delete/:id', checkManager, async (req, res) => {
     const { id } = req.params;
+    const { returnTo } = req.body;
     try {
         await db('milestones').where({ milestoneid: id }).del();
-        res.redirect('/milestones');
+        res.redirect(returnTo || '/milestones');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error deleting milestone');
@@ -676,7 +785,7 @@ app.post('/organizations/edit/:id', checkManager, async (req, res) => {
     try {
         await db('organizations').where({ orgid: id }).update({
             orgname, orgaddress, orgcity, orgstate, orgzipcode, orgcountry, orgemail, orgphonenumber, orgwebsiteurl, orgdescription,
-            orgupdatedat: new Date()
+            orgupdatedate: new Date()
         });
         res.redirect('/organizations');
     } catch (err) {
@@ -709,7 +818,7 @@ app.get('/events', checkAuth, async (req, res) => {
                 'event_occurrences.eventdatetimeend',
                 'event_occurrences.eventlocation'
             )
-            .orderBy('event_occurrences.eventdatetimestart', 'asc');
+            .orderBy('event_occurrences.eventdatetimestart', 'desc');
 
         console.log('Events found:', events.length);
 
@@ -788,7 +897,7 @@ app.post('/contacts/edit/:id', checkManager, async (req, res) => {
     try {
         await db('contacts').where({ contactid: id }).update({
             contactorganizationid, contactfirstname, contactlastname, contactemail, contactphone, contacttitle, contactnotes,
-            contactupdatedat: new Date()
+            contactupdatedate: new Date()
         });
         res.redirect('/organizations');
     } catch (err) {
@@ -857,7 +966,7 @@ app.post('/grants/edit/:id', checkManager, async (req, res) => {
             grantsubmitteddate: grantsubmitteddate || null,
             grantdecisiondate: grantdecisiondate || null,
             grantnotes,
-            grantupdatedat: new Date()
+            grantupdatedate: new Date()
         });
         res.redirect('/grants');
     } catch (err) {
@@ -904,8 +1013,8 @@ app.post('/register/add', async (req, res) => {
     } = req.body;
 
     try {
-        // Check if participant exists
-        let participant = await db('participants').where({ participantemail: email }).first();
+        // Check if participant exists (case-insensitive)
+        let participant = await db('participants').where('participantemail', 'ilike', email).first();
 
         // Check if there is a logged in user to link
         const user = req.session.user;
@@ -932,6 +1041,11 @@ app.post('/register/add', async (req, res) => {
             if (userid && !participant.userid) {
                 await db('participants').where({ participantid: participant.participantid }).update({ userid: userid });
             }
+        }
+
+        // Update session to reflect participant status immediately
+        if (req.session.user) {
+            req.session.user.isParticipant = true;
         }
 
         res.render('register', {

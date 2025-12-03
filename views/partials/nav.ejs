@@ -20,12 +20,11 @@
                         <a href="#" class="dropbtn">Records ▾</a>
                         <div class="dropdown-content">
                             <a href="/events">Events</a>
-                            <a href="/participants">Participants</a>
-                            <a href="/surveys">Surveys</a>
-                            <a href="/milestones">Milestones</a>
-                            <a href="/events">Events</a>
                             <a href="/register">Register</a>
                             <a href="/donations">Donations</a>
+                            <% if (user.role==='Manager' || user.isParticipant) { %>
+                                <a href="/milestones">Milestones</a>
+                                <% } %>
                         </div>
                     </div>
 
@@ -36,6 +35,8 @@
                             <div class="dropdown-content">
                                 <a href="/dashboard">Dashboard</a>
                                 <a href="/users">Users</a>
+                                <a href="/participants">Participants</a>
+                                <a href="/surveys">Surveys</a>
                                 <a href="/organizations">Organizations</a>
                                 <a href="/grants">Grants</a>
                             </div>
