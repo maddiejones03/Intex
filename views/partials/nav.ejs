@@ -11,7 +11,8 @@
                     class="<%= typeof title !== 'undefined' && title === 'About Us' ? 'active' : '' %>">About</a>
                 <a href="/programs"
                     class="<%= typeof title !== 'undefined' && title === 'Programs' ? 'active' : '' %>">Programs</a>
-                <a href="/donate">Donate</a>
+                <a href="/donate"
+                    class="<%= typeof title !== 'undefined' && title === 'Donate' ? 'active' : '' %>">Donate</a>
 
                 <% if (typeof user !=='undefined' && user) { %>
                     <!-- Logged In Users -->
