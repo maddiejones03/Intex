@@ -8,6 +8,17 @@
                     class="btn btn-primary">Add New User</button>
             </div>
 
+            <!-- Search Form -->
+            <form action="/users" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" placeholder="Search by name or email..."
+                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1; padding: 0.5rem;">
+                <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Search</button>
+                <% if (typeof search !=='undefined' && search) { %>
+                    <a href="/users" class="btn btn-outline"
+                        style="padding: 0.5rem 1rem; text-decoration: none; line-height: 1.5;">Clear</a>
+                    <% } %>
+            </form>
+
             <div class="card">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>

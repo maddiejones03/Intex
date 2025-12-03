@@ -382,9 +382,18 @@ app.post('/events/register', checkAuth, async (req, res) => {
 
 // User Maintenance Routes
 app.get('/users', checkManager, async (req, res) => {
+    const { search } = req.query;
     try {
-        const users = await db('users').select('userid', 'email', 'firstname', 'lastname', 'role').orderBy('userid');
-        res.render('users', { title: 'User Management', users, user: req.session.user });
+        let query = db('users').select('userid', 'email', 'firstname', 'lastname', 'role').orderBy('userid');
+
+        if (search) {
+            query = query.where('firstname', 'ilike', `%${search}%`)
+                .orWhere('lastname', 'ilike', `%${search}%`)
+                .orWhere('email', 'ilike', `%${search}%`);
+        }
+
+        const users = await query;
+        res.render('users', { title: 'User Management', users, user: req.session.user, search });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
