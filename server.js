@@ -135,7 +135,6 @@ app.post('/login', async (req, res) => {
             req.session.user = user;
 
             const participant = await db('participants').where('participantemail', 'ilike', email).first();
-            console.log(`Login: Checking participant for ${email}. Found:`, participant);
             if (participant) {
                 if (!participant.userid) {
                     await db('participants').where({ participantid: participant.participantid }).update({ userid: user.userid });
@@ -144,8 +143,6 @@ app.post('/login', async (req, res) => {
             } else {
                 req.session.user.isParticipant = false;
             }
-            console.log(`Login: isParticipant set to ${req.session.user.isParticipant}`);
-
             const redirectUrl = req.session.returnTo || '/';
             delete req.session.returnTo;
             res.redirect(redirectUrl);
