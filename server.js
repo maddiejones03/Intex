@@ -808,12 +808,12 @@ app.post('/grants/delete/:id', checkManager, async (req, res) => {
     }
 });
 
-// Enrollments Management
-app.get('/enroll', checkAuth, async (req, res) => {
+// Enrollments Management (Renamed to Register)
+app.get('/register', checkAuth, async (req, res) => {
     try {
         const enrollments = await db('enrollments').select('*').orderBy('submissiondate', 'desc');
-        res.render('enroll', {
-            title: 'Enroll',
+        res.render('register', {
+            title: 'Register',
             user: req.session.user,
             enrollments: enrollments,
             csrfToken: res.locals.csrfToken
@@ -824,15 +824,19 @@ app.get('/enroll', checkAuth, async (req, res) => {
     }
 });
 
-app.post('/enroll/add', async (req, res) => {
+app.post('/register/add', async (req, res) => {
     const {
-        parentguardianname, phone, email, participantname, participantdob,
+        parentguardianname, phone, email, participantfirstname, participantlastname, participantdob,
+        participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantgender,
         grade, school, programinterest, mariachiinstrument, instrumentexperience,
         feestatus, tuitionagreement, languagepreference, medicalconsent,
         photoconsent, liabilityrelease, parentsignature
     } = req.body;
 
     try {
+        // Concatenate names for the existing table structure
+        const participantname = `${participantfirstname} ${participantlastname}`;
+
         await db('enrollments').insert({
             parentguardianname, phone, email, participantname, participantdob,
             grade, school,
@@ -846,8 +850,8 @@ app.post('/enroll/add', async (req, res) => {
             liabilityrelease: liabilityrelease === 'on',
             parentsignature
         });
-        res.render('enroll', {
-            title: 'Enroll',
+        res.render('register', {
+            title: 'Register',
             user: req.session.user,
             enrollments: [], // Only managers see the list, so empty for public submission
             csrfToken: res.locals.csrfToken,
@@ -859,10 +863,10 @@ app.post('/enroll/add', async (req, res) => {
     }
 });
 
-app.post('/enroll/delete/:id', checkManager, async (req, res) => {
+app.post('/register/delete/:id', checkManager, async (req, res) => {
     try {
         await db('enrollments').where('enrollmentid', req.params.id).del();
-        res.redirect('/enroll');
+        res.redirect('/register');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error deleting enrollment');
