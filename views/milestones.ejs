@@ -1,194 +1,208 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
+        <%- include('partials/aesthetic-bg') %>
 
-        <div class="container section" style="margin-top: 4rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1>Milestones</h1>
-                <% if (user && user.role==='Manager' ) { %>
-                    <button onclick="openModal()" class="btn btn-primary">Add Milestone</button>
-                    <% } %>
-            </div>
+            <div class="container section" style="margin-top: 4rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1>Milestones</h1>
+                    <% if (user && user.role==='Manager' ) { %>
+                        <button onclick="openModal()" class="btn btn-primary">Add Milestone</button>
+                        <% } %>
+                </div>
 
-            <!-- Search Form -->
-            <form action="/milestones" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" placeholder="Search by title or participant..."
-                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
-                <button type="submit" class="btn btn-outline">Search</button>
-                <% if (typeof search !=='undefined' && search) { %>
-                    <a href="/milestones" class="btn btn-outline">Clear</a>
-                    <% } %>
-            </form>
+                <!-- Search Form -->
+                <form action="/milestones" method="GET"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;">
+                    <div class="aesthetic-search">
+                        <input type="text" name="search" placeholder="Search by title or participant..."
+                            value="<%= typeof search !== 'undefined' ? search : '' %>">
+                        <button type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <% if (typeof search !=='undefined' && search) { %>
+                        <a href="/milestones" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; text-decoration: none; border-radius: 50px;">Clear</a>
+                        <% } %>
+                </form>
 
-            <!-- Milestones Table -->
-            <div class="card">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
-                            <th style="padding: 1rem;">ID</th>
-                            <th style="padding: 1rem;">Title</th>
-                            <th style="padding: 1rem;">Participant</th>
-                            <th style="padding: 1rem;">Date</th>
-                            <% if (user && user.role==='Manager' ) { %>
-                                <th style="padding: 1rem;">Actions</th>
-                                <% } %>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% milestones.forEach(m=> { %>
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 1rem;">
-                                    <%= m.milestoneid %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= m.milestonetitle %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <% if (m.participantfirstname) { %>
-                                        <%= m.participantfirstname %>
-                                            <%= m.participantlastname %>
-                                                <% } else { %>
-                                                    <em>Unlinked</em>
-                                                    <% } %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= new Date(m.milestonedate).toLocaleDateString() %>
-                                </td>
+                <!-- Milestones Table -->
+                <div class="card" style="padding: 0; overflow: hidden; border: none; background: transparent;">
+                    <table class="aesthetic-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Participant</th>
+                                <th>Date</th>
                                 <% if (user && user.role==='Manager' ) { %>
-                                    <td style="padding: 1rem;">
-                                        <div style="display: flex; gap: 0.5rem;">
-                                            <button onclick="openEditModal('<%= m.milestoneid %>')"
-                                                class="btn btn-outline"
-                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
-                                            <form action="/milestones/delete/<%= m.milestoneid %>" method="POST"
-                                                onsubmit="return confirm('Are you sure?');" style="display: inline;">
-                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                                <button type="submit" class="btn btn-primary"
-                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
-                                            </form>
-                                        </div>
-                                    </td>
+                                    <th>Actions</th>
                                     <% } %>
                             </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Add Milestone Modal -->
-        <div id="addMilestoneModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
-            <div class="modal-content"
-                style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
-                <span onclick="closeAddModal()"
-                    style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="margin-bottom: 1.5rem;">Add Milestone</h2>
-                <form id="addMilestoneForm" action="/milestones/add" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="form-group">
-                        <label>Participant</label>
-                        <select name="participantid" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            <option value="">-- Select Participant (Optional) --</option>
-                            <% participants.forEach(p=> { %>
-                                <option value="<%= p.participantid %>">
-                                    <%= p.participantfirstname %>
-                                        <%= p.participantlastname %>
-                                </option>
+                        </thead>
+                        <tbody>
+                            <% milestones.forEach(m=> { %>
+                                <tr>
+                                    <td>
+                                        <%= m.milestoneid %>
+                                    </td>
+                                    <td>
+                                        <%= m.milestonetitle %>
+                                    </td>
+                                    <td>
+                                        <% if (m.participantfirstname) { %>
+                                            <%= m.participantfirstname %>
+                                                <%= m.participantlastname %>
+                                                    <% } else { %>
+                                                        <em>Unlinked</em>
+                                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(m.milestonedate).toLocaleDateString() %>
+                                    </td>
+                                    <% if (user && user.role==='Manager' ) { %>
+                                        <td>
+                                            <div style="display: flex; gap: 0.5rem;">
+                                                <button onclick="openEditModal('<%= m.milestoneid %>')"
+                                                    class="btn btn-outline"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px;">Edit</button>
+                                                <form action="/milestones/delete/<%= m.milestoneid %>" method="POST"
+                                                    onsubmit="return confirm('Are you sure?');"
+                                                    style="display: inline;">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                    <button type="submit" class="btn btn-primary"
+                                                        style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444; border-radius: 20px;">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                        <% } %>
+                                </tr>
                                 <% }) %>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Title</label>
-                        <input type="text" name="milestonetitle" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Date</label>
-                        <input type="date" name="milestonedate" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Save</button>
-                </form>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <!-- Edit Milestone Modal -->
-        <div id="editMilestoneModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
-            <div class="modal-content"
-                style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
-                <span onclick="closeEditModal()"
-                    style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="margin-bottom: 1.5rem;">Edit Milestone</h2>
-                <form id="editMilestoneForm" action="" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="form-group">
-                        <label>Participant</label>
-                        <select id="edit_participantid" name="participantid"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            <option value="">-- Select Participant (Optional) --</option>
-                            <% participants.forEach(p=> { %>
-                                <option value="<%= p.participantid %>">
-                                    <%= p.participantfirstname %>
-                                        <%= p.participantlastname %>
-                                </option>
-                                <% }) %>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Title</label>
-                        <input type="text" id="edit_milestonetitle" name="milestonetitle" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Date</label>
-                        <input type="date" id="edit_milestonedate" name="milestonedate" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update</button>
-                </form>
+            <!-- Add Milestone Modal -->
+            <div id="addMilestoneModal" class="modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+                <div class="modal-content"
+                    style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
+                    <span onclick="closeAddModal()"
+                        style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="margin-bottom: 1.5rem;">Add Milestone</h2>
+                    <form id="addMilestoneForm" action="/milestones/add" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="form-group">
+                            <label>Participant</label>
+                            <select name="participantid" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                                <option value="">-- Select Participant (Optional) --</option>
+                                <% participants.forEach(p=> { %>
+                                    <option value="<%= p.participantid %>">
+                                        <%= p.participantfirstname %>
+                                            <%= p.participantlastname %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Title</label>
+                            <input type="text" name="milestonetitle" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Date</label>
+                            <input type="date" name="milestonedate" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <button type="submit" class="btn btn-primary"
+                            style="width: 100%; margin-top: 2rem;">Save</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <script>
-            const milestonesData = <% - JSON.stringify(milestones) %>;
+            <!-- Edit Milestone Modal -->
+            <div id="editMilestoneModal" class="modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+                <div class="modal-content"
+                    style="background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
+                    <span onclick="closeEditModal()"
+                        style="position: absolute; right: 1rem; top: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="margin-bottom: 1.5rem;">Edit Milestone</h2>
+                    <form id="editMilestoneForm" action="" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="form-group">
+                            <label>Participant</label>
+                            <select id="edit_participantid" name="participantid"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                                <option value="">-- Select Participant (Optional) --</option>
+                                <% participants.forEach(p=> { %>
+                                    <option value="<%= p.participantid %>">
+                                        <%= p.participantfirstname %>
+                                            <%= p.participantlastname %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Title</label>
+                            <input type="text" id="edit_milestonetitle" name="milestonetitle" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Date</label>
+                            <input type="date" id="edit_milestonedate" name="milestonedate" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <button type="submit" class="btn btn-primary"
+                            style="width: 100%; margin-top: 2rem;">Update</button>
+                    </form>
+                </div>
+            </div>
 
-            function openAddModal() {
-                document.getElementById('addMilestoneModal').style.display = 'block';
-                document.getElementById('addMilestoneForm').reset();
-                document.querySelector('#addMilestoneForm input[name="milestonedate"]').valueAsDate = new Date();
-            }
+            <script>
+                const milestonesData = <% - JSON.stringify(milestones) %>;
 
-            function closeAddModal() {
-                document.getElementById('addMilestoneModal').style.display = 'none';
-            }
-
-            function openEditModal(id) {
-                const m = milestonesData.find(m => m.milestoneid == id);
-                if (!m) return;
-
-                document.getElementById('editMilestoneModal').style.display = 'block';
-                const form = document.getElementById('editMilestoneForm');
-                form.action = `/milestones/edit/${m.milestoneid}`;
-
-                document.getElementById('edit_participantid').value = m.participantid || '';
-                document.getElementById('edit_milestonetitle').value = m.milestonetitle;
-                document.getElementById('edit_milestonedate').value = m.milestonedate ? m.milestonedate.split('T')[0] : '';
-            }
-
-            function closeEditModal() {
-                document.getElementById('editMilestoneModal').style.display = 'none';
-            }
-
-            // Close modals if clicked outside
-            window.onclick = function (event) {
-                if (event.target == document.getElementById('addMilestoneModal')) {
-                    closeAddModal();
+                function openAddModal() {
+                    document.getElementById('addMilestoneModal').style.display = 'block';
+                    document.getElementById('addMilestoneForm').reset();
+                    document.querySelector('#addMilestoneForm input[name="milestonedate"]').valueAsDate = new Date();
                 }
-                if (event.target == document.getElementById('editMilestoneModal')) {
-                    closeEditModal();
-                }
-            }
-        </script>
 
-        <%- include('partials/footer') %>
+                function closeAddModal() {
+                    document.getElementById('addMilestoneModal').style.display = 'none';
+                }
+
+                function openEditModal(id) {
+                    const m = milestonesData.find(m => m.milestoneid == id);
+                    if (!m) return;
+
+                    document.getElementById('editMilestoneModal').style.display = 'block';
+                    const form = document.getElementById('editMilestoneForm');
+                    form.action = `/milestones/edit/${m.milestoneid}`;
+
+                    document.getElementById('edit_participantid').value = m.participantid || '';
+                    document.getElementById('edit_milestonetitle').value = m.milestonetitle;
+                    document.getElementById('edit_milestonedate').value = m.milestonedate ? m.milestonedate.split('T')[0] : '';
+                }
+
+                function closeEditModal() {
+                    document.getElementById('editMilestoneModal').style.display = 'none';
+                }
+
+                // Close modals if clicked outside
+                window.onclick = function (event) {
+                    if (event.target == document.getElementById('addMilestoneModal')) {
+                        closeAddModal();
+                    }
+                    if (event.target == document.getElementById('editMilestoneModal')) {
+                        closeEditModal();
+                    }
+                }
+            </script>
+
+            <%- include('partials/footer') %>

@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevButton = carousel.querySelector('.carousel-button.prev');
         const nextButton = carousel.querySelector('.carousel-button.next');
 
-        if (!track || !prevButton || !nextButton) return;
+        if (!track) return;
 
         const cards = Array.from(track.children);
         let currentIndex = 0;
@@ -24,36 +24,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Ensure index is within bounds
             const maxIndex = Math.max(0, cards.length - cardsPerView);
-            currentIndex = Math.min(currentIndex, maxIndex);
-            currentIndex = Math.max(0, currentIndex);
+            // Allow looping for auto-play, but clamp for manual if needed
+            // For now, just clamp to be safe, but we will handle loop in moveNext
+            if (currentIndex > maxIndex) currentIndex = 0;
 
             const translateX = -(currentIndex * (100 / cardsPerView));
             track.style.transform = `translateX(${translateX}%)`;
 
-            // Update button states
-            prevButton.disabled = currentIndex === 0;
-            nextButton.disabled = currentIndex >= maxIndex;
-
-            prevButton.style.opacity = prevButton.disabled ? '0.5' : '1';
-            nextButton.style.opacity = nextButton.disabled ? '0.5' : '1';
-            prevButton.style.cursor = prevButton.disabled ? 'default' : 'pointer';
-            nextButton.style.cursor = nextButton.disabled ? 'default' : 'pointer';
+            // Update button states if they exist
+            if (prevButton) {
+                prevButton.disabled = currentIndex === 0;
+                prevButton.style.opacity = prevButton.disabled ? '0.5' : '1';
+                prevButton.style.cursor = prevButton.disabled ? 'default' : 'pointer';
+            }
+            if (nextButton) {
+                nextButton.disabled = currentIndex >= maxIndex;
+                nextButton.style.opacity = nextButton.disabled ? '0.5' : '1';
+                nextButton.style.cursor = nextButton.disabled ? 'default' : 'pointer';
+            }
         }
 
-        nextButton.addEventListener('click', () => {
+        if (nextButton) {
+            nextButton.addEventListener('click', () => {
+                const cardsPerView = getCardsPerView();
+                const maxIndex = Math.max(0, cards.length - cardsPerView);
+                if (currentIndex < maxIndex) {
+                    currentIndex++;
+                    updateCarousel();
+                }
+            });
+        }
+
+        if (prevButton) {
+            prevButton.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateCarousel();
+                }
+            });
+        }
+
+        // Auto Play
+        function moveNext() {
             const cardsPerView = getCardsPerView();
             const maxIndex = Math.max(0, cards.length - cardsPerView);
             if (currentIndex < maxIndex) {
                 currentIndex++;
-                updateCarousel();
+            } else {
+                currentIndex = 0; // Loop back to start
             }
-        });
+            updateCarousel();
+        }
 
-        prevButton.addEventListener('click', () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateCarousel();
-            }
+        let autoPlayTimer = setInterval(moveNext, 3000);
+
+        // Pause on hover
+        carousel.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
+        carousel.addEventListener('mouseleave', () => {
+            clearInterval(autoPlayTimer);
+            autoPlayTimer = setInterval(moveNext, 3000);
         });
 
         // Handle resize

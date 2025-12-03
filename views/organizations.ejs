@@ -1,313 +1,328 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
+        <%- include('partials/aesthetic-bg-cool') %>
 
-        <div class="container section" style="margin-top: 4rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1>Organizations</h1>
-                <button onclick="document.getElementById('addOrgModal').style.display='block'"
-                    class="btn btn-primary">Add Organization</button>
-            </div>
+            <div class="container section" style="margin-top: 4rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1>Organizations</h1>
+                    <button onclick="document.getElementById('addOrgModal').style.display='block'"
+                        class="btn btn-primary">Add Organization</button>
+                </div>
 
-            <!-- Search Bar -->
-            <form action="/organizations" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" placeholder="Search organizations..."
-                    value="<%= typeof search !== 'undefined' ? search : '' %>"
-                    style="flex: 1; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
-                <button type="submit" class="btn btn-primary">Search</button>
-                <% if (typeof search !=='undefined' && search) { %>
-                    <a href="/organizations" class="btn btn-outline">Clear</a>
-                    <% } %>
-            </form>
+                <!-- Search Bar -->
+                <form action="/organizations" method="GET"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;">
+                    <div class="aesthetic-search">
+                        <input type="text" name="search" placeholder="Search organizations..."
+                            value="<%= typeof search !== 'undefined' ? search : '' %>">
+                        <button type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <% if (typeof search !=='undefined' && search) { %>
+                        <a href="/organizations" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; text-decoration: none; border-radius: 50px;">Clear</a>
+                        <% } %>
+                </form>
 
-            <div class="grid" style="grid-template-columns: 1fr; gap: 2rem;">
-                <% organizations.forEach(org=> { %>
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div>
-                                <h2 style="margin-bottom: 0.5rem;">
-                                    <%= org.orgname %>
-                                </h2>
-                                <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
-                                    <%= org.orgcity %>, <%= org.orgstate %>
-                                </p>
-                                <% if (org.orgwebsiteurl) { %>
-                                    <a href="<%= org.orgwebsiteurl %>" target="_blank"
-                                        style="color: var(--primary-color); text-decoration: none;">Visit Website</a>
-                                    <% } %>
-                            </div>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button onclick="editOrg('<%= JSON.stringify(org).replace(/'/g, '&#39;') %>')"
-                                    class="btn btn-outline"
-                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
-                                <form action="/organizations/delete/<%= org.orgid %>" method="POST"
-                                    onsubmit="return confirm('Are you sure? This will delete all associated contacts and grants.');"
-                                    style="display: inline;">
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button type="submit" class="btn btn-primary"
-                                        style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h3 style="font-size: 1.1rem;">Contacts</h3>
-                                <button onclick="addContact('<%= org.orgid %>')" class="btn btn-outline"
-                                    style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Add Contact</button>
-                            </div>
-
-                            <% const orgContacts=contacts.filter(c=> c.contactorganizationid === org.orgid); %>
-                                <% if (orgContacts.length> 0) { %>
-                                    <div style="display: grid; gap: 1rem;">
-                                        <% orgContacts.forEach(contact=> { %>
-                                            <div
-                                                style="background: #f9f9f9; padding: 1rem; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
-                                                <div>
-                                                    <strong>
-                                                        <%= contact.contactfirstname %>
-                                                            <%= contact.contactlastname %>
-                                                    </strong>
-                                                    <% if (contact.contacttitle) { %>
-                                                        <span style="color: var(--text-secondary); font-size: 0.9rem;">
-                                                            - <%= contact.contacttitle %></span>
-                                                        <% } %>
-                                                            <br>
-                                                            <a href="mailto:<%= contact.contactemail %>"
-                                                                style="color: var(--primary-color); font-size: 0.9rem;">
-                                                                <%= contact.contactemail %>
-                                                            </a>
-                                                </div>
-                                                <div style="display: flex; gap: 0.5rem;">
-                                                    <button
-                                                        onclick="editContact('<%= JSON.stringify(contact).replace(/'/g, '&#39;') %>')"
-                                                        class="btn btn-outline"
-                                                        style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">Edit</button>
-                                                    <form action="/contacts/delete/<%= contact.contactid %>"
-                                                        method="POST" onsubmit="return confirm('Delete this contact?');"
-                                                        style="display: inline;">
-                                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                                        <button type="submit" class="btn btn-primary"
-                                                            style="padding: 0.2rem 0.5rem; font-size: 0.7rem; background-color: #ff4444; border-color: #ff4444;">&times;</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                            <% }); %>
-                                    </div>
-                                    <% } else { %>
-                                        <p style="color: var(--text-secondary); font-style: italic; font-size: 0.9rem;">
-                                            No contacts listed.</p>
+                <div class="grid" style="grid-template-columns: 1fr; gap: 2rem;">
+                    <% organizations.forEach(org=> { %>
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <h2 style="margin-bottom: 0.5rem;">
+                                        <%= org.orgname %>
+                                    </h2>
+                                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                        <%= org.orgcity %>, <%= org.orgstate %>
+                                    </p>
+                                    <% if (org.orgwebsiteurl) { %>
+                                        <a href="<%= org.orgwebsiteurl %>" target="_blank"
+                                            style="color: var(--primary-color); text-decoration: none;">Visit
+                                            Website</a>
                                         <% } %>
-                        </div>
-                    </div>
-                    <% }); %>
-            </div>
-        </div>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button onclick="editOrg('<%= JSON.stringify(org).replace(/'/g, '&#39;') %>')"
+                                        class="btn btn-outline"
+                                        style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
+                                    <form action="/organizations/delete/<%= org.orgid %>" method="POST"
+                                        onsubmit="return confirm('Are you sure? This will delete all associated contacts and grants.');"
+                                        style="display: inline;">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button type="submit" class="btn btn-primary"
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
 
-        <!-- Add Organization Modal -->
-        <div id="addOrgModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-            <div class="form-container"
-                style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
-                <span onclick="document.getElementById('addOrgModal').style.display='none'"
-                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="text-align: center; margin-bottom: 2rem;">Add Organization</h2>
-                <form action="/organizations/add" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="form-group">
-                        <label>Organization Name</label>
-                        <input type="text" name="orgname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h3 style="font-size: 1.1rem;">Contacts</h3>
+                                    <button onclick="addContact('<%= org.orgid %>')" class="btn btn-outline"
+                                        style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Add Contact</button>
+                                </div>
+
+                                <% const orgContacts=contacts.filter(c=> c.contactorganizationid === org.orgid); %>
+                                    <% if (orgContacts.length> 0) { %>
+                                        <div style="display: grid; gap: 1rem;">
+                                            <% orgContacts.forEach(contact=> { %>
+                                                <div
+                                                    style="background: #f9f9f9; padding: 1rem; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                                                    <div>
+                                                        <strong>
+                                                            <%= contact.contactfirstname %>
+                                                                <%= contact.contactlastname %>
+                                                        </strong>
+                                                        <% if (contact.contacttitle) { %>
+                                                            <span
+                                                                style="color: var(--text-secondary); font-size: 0.9rem;">
+                                                                - <%= contact.contacttitle %></span>
+                                                            <% } %>
+                                                                <br>
+                                                                <a href="mailto:<%= contact.contactemail %>"
+                                                                    style="color: var(--primary-color); font-size: 0.9rem;">
+                                                                    <%= contact.contactemail %>
+                                                                </a>
+                                                    </div>
+                                                    <div style="display: flex; gap: 0.5rem;">
+                                                        <button
+                                                            onclick="editContact('<%= JSON.stringify(contact).replace(/'/g, '&#39;') %>')"
+                                                            class="btn btn-outline"
+                                                            style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">Edit</button>
+                                                        <form action="/contacts/delete/<%= contact.contactid %>"
+                                                            method="POST"
+                                                            onsubmit="return confirm('Delete this contact?');"
+                                                            style="display: inline;">
+                                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                            <button type="submit" class="btn btn-primary"
+                                                                style="padding: 0.2rem 0.5rem; font-size: 0.7rem; background-color: #ff4444; border-color: #ff4444;">&times;</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                        <% } else { %>
+                                            <p
+                                                style="color: var(--text-secondary); font-style: italic; font-size: 0.9rem;">
+                                                No contacts listed.</p>
+                                            <% } %>
+                            </div>
+                        </div>
+                        <% }); %>
+                </div>
+            </div>
+
+            <!-- Add Organization Modal -->
+            <div id="addOrgModal" class="modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+                <div class="form-container"
+                    style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
+                    <span onclick="document.getElementById('addOrgModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Add Organization</h2>
+                    <form action="/organizations/add" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="form-group">
-                            <label>City</label>
-                            <input type="text" name="orgcity"
+                            <label>Organization Name</label>
+                            <input type="text" name="orgname" required
                                 style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
-                        <div class="form-group">
-                            <label>State</label>
-                            <input type="text" name="orgstate"
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" name="orgcity"
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" name="orgstate"
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Email</label>
+                            <input type="email" name="orgemail"
                                 style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Email</label>
-                        <input type="email" name="orgemail" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Website URL</label>
-                        <input type="url" name="orgwebsiteurl"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Description</label>
-                        <textarea name="orgdescription" rows="3"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
-                        Organization</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Edit Organization Modal -->
-        <div id="editOrgModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-            <div class="form-container"
-                style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
-                <span onclick="document.getElementById('editOrgModal').style.display='none'"
-                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="text-align: center; margin-bottom: 2rem;">Edit Organization</h2>
-                <form id="editOrgForm" action="" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="form-group">
-                        <label>Organization Name</label>
-                        <input type="text" id="edit_orgname" name="orgname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                        <div class="form-group">
-                            <label>City</label>
-                            <input type="text" id="edit_orgcity" name="orgcity"
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Website URL</label>
+                            <input type="url" name="orgwebsiteurl"
                                 style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Description</label>
+                            <textarea name="orgdescription" rows="3"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
+                            Organization</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Organization Modal -->
+            <div id="editOrgModal" class="modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+                <div class="form-container"
+                    style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
+                    <span onclick="document.getElementById('editOrgModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Organization</h2>
+                    <form id="editOrgForm" action="" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="form-group">
-                            <label>State</label>
-                            <input type="text" id="edit_orgstate" name="orgstate"
+                            <label>Organization Name</label>
+                            <input type="text" id="edit_orgname" name="orgname" required
                                 style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
                         </div>
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Email</label>
-                        <input type="email" id="edit_orgemail" name="orgemail"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Website URL</label>
-                        <input type="url" id="edit_orgwebsiteurl" name="orgwebsiteurl"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Description</label>
-                        <textarea id="edit_orgdescription" name="orgdescription" rows="3"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
-                        Organization</button>
-                </form>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" id="edit_orgcity" name="orgcity"
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" id="edit_orgstate" name="orgstate"
+                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Email</label>
+                            <input type="email" id="edit_orgemail" name="orgemail"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Website URL</label>
+                            <input type="url" id="edit_orgwebsiteurl" name="orgwebsiteurl"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Description</label>
+                            <textarea id="edit_orgdescription" name="orgdescription" rows="3"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
+                            Organization</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <!-- Add Contact Modal -->
-        <div id="addContactModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-            <div class="form-container"
-                style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
-                <span onclick="document.getElementById('addContactModal').style.display='none'"
-                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="text-align: center; margin-bottom: 2rem;">Add Contact</h2>
-                <form action="/contacts/add" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <input type="hidden" id="add_contactorganizationid" name="contactorganizationid">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" name="contactfirstname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Last Name</label>
-                        <input type="text" name="contactlastname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Email</label>
-                        <input type="email" name="contactemail"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Title</label>
-                        <input type="text" name="contacttitle"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
-                        Contact</button>
-                </form>
+            <!-- Add Contact Modal -->
+            <div id="addContactModal" class="modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+                <div class="form-container"
+                    style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
+                    <span onclick="document.getElementById('addContactModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Add Contact</h2>
+                    <form action="/contacts/add" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" id="add_contactorganizationid" name="contactorganizationid">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="contactfirstname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Last Name</label>
+                            <input type="text" name="contactlastname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Email</label>
+                            <input type="email" name="contactemail"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Title</label>
+                            <input type="text" name="contacttitle"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
+                            Contact</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <!-- Edit Contact Modal -->
-        <div id="editContactModal" class="modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-            <div class="form-container"
-                style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
-                <span onclick="document.getElementById('editContactModal').style.display='none'"
-                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="text-align: center; margin-bottom: 2rem;">Edit Contact</h2>
-                <form id="editContactForm" action="" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <input type="hidden" id="edit_contactorganizationid" name="contactorganizationid">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" id="edit_contactfirstname" name="contactfirstname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Last Name</label>
-                        <input type="text" id="edit_contactlastname" name="contactlastname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Email</label>
-                        <input type="email" id="edit_contactemail" name="contactemail"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Title</label>
-                        <input type="text" id="edit_contacttitle" name="contacttitle"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
-                        Contact</button>
-                </form>
+            <!-- Edit Contact Modal -->
+            <div id="editContactModal" class="modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
+                <div class="form-container"
+                    style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
+                    <span onclick="document.getElementById('editContactModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Contact</h2>
+                    <form id="editContactForm" action="" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" id="edit_contactorganizationid" name="contactorganizationid">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" id="edit_contactfirstname" name="contactfirstname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Last Name</label>
+                            <input type="text" id="edit_contactlastname" name="contactlastname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Email</label>
+                            <input type="email" id="edit_contactemail" name="contactemail"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Title</label>
+                            <input type="text" id="edit_contacttitle" name="contacttitle"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
+                            Contact</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <script>
-            function editOrg(orgStr) {
-                const org = JSON.parse(orgStr);
-                document.getElementById('editOrgForm').action = '/organizations/edit/' + org.orgid;
-                document.getElementById('edit_orgname').value = org.orgname;
-                document.getElementById('edit_orgcity').value = org.orgcity || '';
-                document.getElementById('edit_orgstate').value = org.orgstate || '';
-                document.getElementById('edit_orgemail').value = org.orgemail || '';
-                document.getElementById('edit_orgwebsiteurl').value = org.orgwebsiteurl || '';
-                document.getElementById('edit_orgdescription').value = org.orgdescription || '';
-                document.getElementById('editOrgModal').style.display = 'block';
-            }
-
-            function addContact(orgId) {
-                document.getElementById('add_contactorganizationid').value = orgId;
-                document.getElementById('addContactModal').style.display = 'block';
-            }
-
-            function editContact(contactStr) {
-                const contact = JSON.parse(contactStr);
-                document.getElementById('editContactForm').action = '/contacts/edit/' + contact.contactid;
-                document.getElementById('edit_contactorganizationid').value = contact.contactorganizationid;
-                document.getElementById('edit_contactfirstname').value = contact.contactfirstname;
-                document.getElementById('edit_contactlastname').value = contact.contactlastname;
-                document.getElementById('edit_contactemail').value = contact.contactemail || '';
-                document.getElementById('edit_contacttitle').value = contact.contacttitle || '';
-                document.getElementById('editContactModal').style.display = 'block';
-            }
-
-            // Close modals when clicking outside
-            window.onclick = function (event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.style.display = "none";
+            <script>
+                function editOrg(orgStr) {
+                    const org = JSON.parse(orgStr);
+                    document.getElementById('editOrgForm').action = '/organizations/edit/' + org.orgid;
+                    document.getElementById('edit_orgname').value = org.orgname;
+                    document.getElementById('edit_orgcity').value = org.orgcity || '';
+                    document.getElementById('edit_orgstate').value = org.orgstate || '';
+                    document.getElementById('edit_orgemail').value = org.orgemail || '';
+                    document.getElementById('edit_orgwebsiteurl').value = org.orgwebsiteurl || '';
+                    document.getElementById('edit_orgdescription').value = org.orgdescription || '';
+                    document.getElementById('editOrgModal').style.display = 'block';
                 }
-            }
-        </script>
 
-        <%- include('partials/footer') %>
+                function addContact(orgId) {
+                    document.getElementById('add_contactorganizationid').value = orgId;
+                    document.getElementById('addContactModal').style.display = 'block';
+                }
+
+                function editContact(contactStr) {
+                    const contact = JSON.parse(contactStr);
+                    document.getElementById('editContactForm').action = '/contacts/edit/' + contact.contactid;
+                    document.getElementById('edit_contactorganizationid').value = contact.contactorganizationid;
+                    document.getElementById('edit_contactfirstname').value = contact.contactfirstname;
+                    document.getElementById('edit_contactlastname').value = contact.contactlastname;
+                    document.getElementById('edit_contactemail').value = contact.contactemail || '';
+                    document.getElementById('edit_contacttitle').value = contact.contacttitle || '';
+                    document.getElementById('editContactModal').style.display = 'block';
+                }
+
+                // Close modals when clicking outside
+                window.onclick = function (event) {
+                    if (event.target.classList.contains('modal')) {
+                        event.target.style.display = "none";
+                    }
+                }
+            </script>
+
+            <%- include('partials/footer') %>
