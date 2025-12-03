@@ -69,9 +69,8 @@
                                     <% if (user && user.role==='Manager' ) { %>
                                         <td>
                                             <div style="display: flex; gap: 0.5rem;">
-                                                <button onclick="openEditModal('<%= p.participantid %>')"
-                                                    class="btn btn-outline"
-                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px;">Edit</button>
+                                                <a href="/participants/<%= p.participantid %>" class="btn btn-outline"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px; text-decoration: none;">Edit</a>
                                                 <form action="/participants/delete/<%= p.participantid %>" method="POST"
                                                     onsubmit="return confirm('Are you sure? This will delete all associated donations and milestones.');"
                                                     style="display: inline;">
@@ -151,124 +150,20 @@
                 </div>
             </div>
 
-            <!-- Edit Participant Modal -->
-            <div id="editParticipantModal" class="modal"
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-                <div class="form-container"
-                    style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
-                    <span onclick="document.getElementById('editParticipantModal').style.display='none'"
-                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Participant</h2>
-                    <form id="editParticipantForm" action="" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label>First Name</label>
-                                <input type="text" id="edit_participantfirstname" name="participantfirstname" required
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                            <div class="form-group">
-                                <label>Last Name</label>
-                                <input type="text" id="edit_participantlastname" name="participantlastname" required
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Email</label>
-                            <input type="email" id="edit_participantemail" name="participantemail" required
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Phone</label>
-                            <input type="tel" id="edit_participantphone" name="participantphone"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                            <div class="form-group">
-                                <label>City</label>
-                                <input type="text" id="edit_participantcity" name="participantcity"
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                            <div class="form-group">
-                                <label>State</label>
-                                <input type="text" id="edit_participantstate" name="participantstate"
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                            <div class="form-group">
-                                <label>Zip</label>
-                                <input type="text" id="edit_participantzip" name="participantzip"
-                                    style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Date of Birth</label>
-                            <input type="date" id="edit_participantdob" name="participantdob"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
-                            Participant</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Hidden JSON Data -->
-            <script id="participants-data" type="application/json">
-                <%- JSON.stringify(participants) %>
-            </script>
 
             <script>
-                // Safely parse the data
-                let participantsData = [];
-                try {
-                    const dataElement = document.getElementById('participants-data');
-                    if (dataElement) {
-                        participantsData = JSON.parse(dataElement.textContent);
-                    }
-                } catch (e) {
-                    console.error('Error parsing participants data:', e);
-                }
-
                 function openAddModal() {
                     const modal = document.getElementById('addParticipantModal');
                     if (modal) modal.style.display = 'block';
                 }
 
-                function openEditModal(id) {
-                    const p = participantsData.find(p => p.participantid == id);
-                    if (!p) return;
-
-                    const modal = document.getElementById('editParticipantModal');
-                    if (!modal) return;
-
-                    modal.style.display = 'block';
-                    document.getElementById('editParticipantForm').action = `/participants/edit/${p.participantid}`;
-
-                    const form = document.getElementById('editParticipantForm');
-                    if (form) {
-                        form.participantfirstname.value = p.participantfirstname;
-                        form.participantlastname.value = p.participantlastname;
-                        form.participantemail.value = p.participantemail;
-                        form.participantphone.value = p.participantphone || '';
-                        form.participantcity.value = p.participantcity || '';
-                        form.participantstate.value = p.participantstate || '';
-                        form.participantzip.value = p.participantzip || '';
-                        // Handle DOB
-                        form.participantdob.value = p.participantdob ? new Date(p.participantdob).toISOString().split('T')[0] : '';
-                    }
-                }
-
                 // Close modal if clicked outside
                 window.onclick = function (event) {
                     const addModal = document.getElementById('addParticipantModal');
-                    const editModal = document.getElementById('editParticipantModal');
 
                     if (addModal && event.target == addModal) {
                         addModal.style.display = 'none';
-                    }
-                    if (editModal && event.target == editModal) {
-                        editModal.style.display = 'none';
                     }
                 }
             </script>
