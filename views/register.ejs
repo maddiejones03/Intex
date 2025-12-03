@@ -16,7 +16,7 @@
                     </div>
                     <% } %>
 
-                        <form action="/enrollments/add" method="POST">
+                        <form id="registerForm" action="/register/add" method="POST">
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
                             <div class="form-section"
