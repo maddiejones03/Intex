@@ -179,6 +179,7 @@ app.get('/participants', checkAuth, async (req, res) => {
         if (search) {
             query = query.where('participantfirstname', 'ilike', `%${search}%`)
                 .orWhere('participantlastname', 'ilike', `%${search}%`)
+                .orWhere(db.raw("participantfirstname || ' ' || participantlastname"), 'ilike', `%${search}%`)
                 .orWhere('participantemail', 'ilike', `%${search}%`);
         }
         const participants = await query;
