@@ -1,170 +1,181 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
+        <%- include('partials/aesthetic-bg-cool') %>
 
-        <div class="container section" style="margin-top: 4rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1>User Management</h1>
-                <button onclick="document.getElementById('addUserModal').style.display='block'"
-                    class="btn btn-primary">Add New User</button>
-            </div>
+            <div class="container section" style="margin-top: 4rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1>User Management</h1>
+                    <button onclick="document.getElementById('addUserModal').style.display='block'"
+                        class="btn btn-primary">Add New User</button>
+                </div>
 
-            <!-- Search Form -->
-            <form action="/users" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" placeholder="Search by name or email..."
-                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1; padding: 0.5rem;">
-                <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Search</button>
-                <% if (typeof search !=='undefined' && search) { %>
-                    <a href="/users" class="btn btn-outline"
-                        style="padding: 0.5rem 1rem; text-decoration: none; line-height: 1.5;">Clear</a>
-                    <% } %>
-            </form>
+                <!-- Search Form -->
+                <form action="/users" method="GET"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;">
+                    <div class="aesthetic-search">
+                        <input type="text" name="search" placeholder="Search by name or email..."
+                            value="<%= typeof search !== 'undefined' ? search : '' %>">
+                        <button type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <% if (typeof search !=='undefined' && search) { %>
+                        <a href="/users" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; text-decoration: none; border-radius: 50px;">Clear</a>
+                        <% } %>
+                </form>
 
-            <div class="card">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
-                            <th style="padding: 1rem;">ID</th>
-                            <th style="padding: 1rem;">Email</th>
-                            <th style="padding: 1rem;">First Name</th>
-                            <th style="padding: 1rem;">Last Name</th>
-                            <th style="padding: 1rem;">Role</th>
-                            <th style="padding: 1rem;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% users.forEach(u=> { %>
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 1rem;">
-                                    <%= u.userid %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= u.email %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= u.firstname %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= u.lastname %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <%= u.role %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <div style="display: flex; gap: 0.5rem;">
-                                        <button
-                                            onclick="editUser('<%= u.userid %>', '<%= u.email %>', '<%= u.firstname %>', '<%= u.lastname %>', '<%= u.role %>')"
-                                            class="btn btn-outline"
-                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Edit</button>
-                                        <form action="/users/delete/<%= u.userid %>" method="POST"
-                                            onsubmit="return confirm('Are you sure?');" style="display: inline;">
-                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                            <button type="submit" class="btn btn-primary"
-                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444;">Delete</button>
-                                        </form>
-                                    </div>
-                                </td>
+                <div class="card" style="padding: 0; overflow: hidden; border: none; background: transparent;">
+                    <table class="aesthetic-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Role</th>
+                                <th>Actions</th>
                             </tr>
-                            <% }); %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(u=> { %>
+                                <tr>
+                                    <td>
+                                        <%= u.userid %>
+                                    </td>
+                                    <td>
+                                        <%= u.email %>
+                                    </td>
+                                    <td>
+                                        <%= u.firstname %>
+                                    </td>
+                                    <td>
+                                        <%= u.lastname %>
+                                    </td>
+                                    <td>
+                                        <%= u.role %>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button
+                                                onclick="editUser('<%= u.userid %>', '<%= u.email %>', '<%= u.firstname %>', '<%= u.lastname %>', '<%= u.role %>')"
+                                                class="btn btn-outline"
+                                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px;">Edit</button>
+                                            <form action="/users/delete/<%= u.userid %>" method="POST"
+                                                onsubmit="return confirm('Are you sure?');" style="display: inline;">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <button type="submit" class="btn btn-primary"
+                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444; border-radius: 20px;">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <!-- Add User Modal -->
-        <div id="addUserModal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
-            <div class="form-container"
-                style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
-                <span onclick="document.getElementById('addUserModal').style.display='none'"
-                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="text-align: center; margin-bottom: 2rem;">Add User</h2>
-                <form action="/users/add" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" name="email" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="firstname">First Name</label>
-                        <input type="text" name="firstname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="lastname">Last Name</label>
-                        <input type="text" name="lastname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="password">Password</label>
-                        <input type="password" name="password" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="role">Role</label>
-                        <select name="role" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            <option value="User">User</option>
-                            <option value="Manager">Manager</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Create
-                        User</button>
-                </form>
+            <!-- Add User Modal -->
+            <div id="addUserModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+                <div class="form-container"
+                    style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
+                    <span onclick="document.getElementById('addUserModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Add User</h2>
+                    <form action="/users/add" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="firstname">First Name</label>
+                            <input type="text" name="firstname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="lastname">Last Name</label>
+                            <input type="text" name="lastname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="role">Role</label>
+                            <select name="role" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                                <option value="User">User</option>
+                                <option value="Manager">Manager</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Create
+                            User</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <!-- Edit User Modal -->
-        <div id="editUserModal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
-            <div class="form-container"
-                style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
-                <span onclick="document.getElementById('editUserModal').style.display='none'"
-                    style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                <h2 style="text-align: center; margin-bottom: 2rem;">Edit User</h2>
-                <form id="editUserForm" action="" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="form-group">
-                        <label for="edit_email">Email</label>
-                        <input type="email" id="edit_email" name="email" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="edit_firstname">First Name</label>
-                        <input type="text" id="edit_firstname" name="firstname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="edit_lastname">Last Name</label>
-                        <input type="text" id="edit_lastname" name="lastname" required
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="edit_password">New Password (leave blank to keep)</label>
-                        <input type="password" name="password"
-                            style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                    </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="edit_role">Role</label>
-                        <select id="edit_role" name="role" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                            <option value="User">User</option>
-                            <option value="Manager">Manager</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
-                        User</button>
-                </form>
+            <!-- Edit User Modal -->
+            <div id="editUserModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+                <div class="form-container"
+                    style="margin: 10vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 500px;">
+                    <span onclick="document.getElementById('editUserModal').style.display='none'"
+                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit User</h2>
+                    <form id="editUserForm" action="" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="form-group">
+                            <label for="edit_email">Email</label>
+                            <input type="email" id="edit_email" name="email" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="edit_firstname">First Name</label>
+                            <input type="text" id="edit_firstname" name="firstname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="edit_lastname">Last Name</label>
+                            <input type="text" id="edit_lastname" name="lastname" required
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="edit_password">New Password (leave blank to keep)</label>
+                            <input type="password" name="password"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="edit_role">Role</label>
+                            <select id="edit_role" name="role"
+                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                                <option value="User">User</option>
+                                <option value="Manager">Manager</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
+                            User</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <script>
-            function editUser(id, email, firstname, lastname, role) {
-                document.getElementById('editUserForm').action = '/users/edit/' + id;
-                document.getElementById('edit_email').value = email;
-                document.getElementById('edit_firstname').value = firstname;
-                document.getElementById('edit_lastname').value = lastname;
-                document.getElementById('edit_role').value = role;
-                document.getElementById('editUserModal').style.display = 'block';
-            }
-        </script>
+            <script>
+                function editUser(id, email, firstname, lastname, role) {
+                    document.getElementById('editUserForm').action = '/users/edit/' + id;
+                    document.getElementById('edit_email').value = email;
+                    document.getElementById('edit_firstname').value = firstname;
+                    document.getElementById('edit_lastname').value = lastname;
+                    document.getElementById('edit_role').value = role;
+                    document.getElementById('editUserModal').style.display = 'block';
+                }
+            </script>
 
-        <%- include('partials/footer') %>
+            <%- include('partials/footer') %>
