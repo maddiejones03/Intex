@@ -99,6 +99,13 @@ app.post('/login', async (req, res) => {
         const user = await db('users').where({ email: email }).first();
         if (user && await bcrypt.compare(password, user.password)) {
             req.session.user = user;
+
+            // Link participant if exists and not linked
+            const participant = await db('participants').where({ participantemail: email }).first();
+            if (participant && !participant.userid) {
+                await db('participants').where({ participantid: participant.participantid }).update({ userid: user.userid });
+            }
+
             const redirectUrl = req.session.returnTo || '/';
             delete req.session.returnTo;
             res.redirect(redirectUrl);
@@ -136,6 +143,13 @@ app.post('/signup', async (req, res) => {
         // Auto-login after signup
         const newUser = await db('users').where({ email: email }).first();
         req.session.user = newUser;
+
+        // Link participant if exists
+        const participant = await db('participants').where({ participantemail: email }).first();
+        if (participant && !participant.userid) {
+            await db('participants').where({ participantid: participant.participantid }).update({ userid: newUser.userid });
+        }
+
         const redirectUrl = req.session.returnTo || '/';
         delete req.session.returnTo;
         res.redirect(redirectUrl);
@@ -192,9 +206,13 @@ app.get('/participants', checkAuth, async (req, res) => {
 app.post('/participants/add', checkManager, async (req, res) => {
     const { participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdateofbirth, participantgender } = req.body;
     try {
+        // Check for existing user to link
+        const user = await db('users').where({ email: participantemail }).first();
+        const userid = user ? user.userid : null;
+
         await db('participants').insert({
-            participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdateofbirth, participantgender,
-            participantcreatedat: new Date()
+            participantfirstname, participantlastname, participantemail, participantphone, participantaddress, participantcity, participantstate, participantzip, participantdob: participantdateofbirth, participantgender,
+            userid: userid
         });
         res.redirect('/participants');
     } catch (err) {
@@ -799,22 +817,24 @@ app.post('/grants/delete/:id', checkManager, async (req, res) => {
 });
 
 // Enrollments Management
-app.get('/enroll', checkAuth, async (req, res) => {
+app.get('/register', async (req, res) => {
     try {
-        const enrollments = await db('enrollments').select('*').orderBy('submissiondate', 'desc');
-        res.render('enroll', {
-            title: 'Enroll',
+        // Only managers see the list, but we are removing enrollments table.
+        // Maybe we should show participants list here for managers?
+        // For now, just render the form.
+        res.render('register', {
+            title: 'Register',
             user: req.session.user,
-            enrollments: enrollments,
+            enrollments: [], // No longer used
             csrfToken: res.locals.csrfToken
         });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error retrieving enrollments');
+        res.status(500).send('Error retrieving registration page');
     }
 });
 
-app.post('/enroll/add', async (req, res) => {
+app.post('/register/add', async (req, res) => {
     const {
         parentguardianname, phone, email, participantname, participantdob,
         grade, school, programinterest, mariachiinstrument, instrumentexperience,
@@ -823,29 +843,46 @@ app.post('/enroll/add', async (req, res) => {
     } = req.body;
 
     try {
-        await db('enrollments').insert({
-            parentguardianname, phone, email, participantname, participantdob,
-            grade, school,
-            programinterest: Array.isArray(programinterest) ? programinterest.join(', ') : programinterest,
-            mariachiinstrument, instrumentexperience,
-            feestatus,
-            tuitionagreement: tuitionagreement === 'on',
-            languagepreference,
-            medicalconsent: medicalconsent === 'on',
-            photoconsent: photoconsent === 'on',
-            liabilityrelease: liabilityrelease === 'on',
-            parentsignature
-        });
-        res.render('enroll', {
-            title: 'Enroll',
+        // Check if participant exists
+        let participant = await db('participants').where({ participantemail: email }).first();
+
+        // Check if there is a logged in user to link
+        const user = req.session.user;
+        const userid = user ? user.userid : null;
+
+        if (!participant) {
+            const nameParts = participantname.trim().split(' ');
+            const firstName = nameParts[0];
+            const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+            // Insert new participant with form data
+            await db('participants').insert({
+                participantfirstname: firstName,
+                participantlastname: lastName,
+                participantemail: email,
+                participantphone: phone,
+                participantdob: participantdob,
+                participantschooloremployer: school,
+                participantfieldofinterest: Array.isArray(programinterest) ? programinterest.join(', ') : programinterest,
+                userid: userid
+            });
+        } else {
+            // Link existing participant if user is logged in and participant is not linked
+            if (userid && !participant.userid) {
+                await db('participants').where({ participantid: participant.participantid }).update({ userid: userid });
+            }
+        }
+
+        res.render('register', {
+            title: 'Register',
             user: req.session.user,
-            enrollments: [], // Only managers see the list, so empty for public submission
+            enrollments: [],
             csrfToken: res.locals.csrfToken,
             success: true
         });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error adding enrollment');
+        res.status(500).send('Error registering');
     }
 });
 
