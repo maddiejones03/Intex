@@ -39,6 +39,7 @@ const checkAuth = (req, res, next) => {
     if (req.session.user) {
         next();
     } else {
+        req.session.returnTo = req.originalUrl;
         res.redirect('/login');
     }
 };
@@ -89,7 +90,7 @@ app.post('/donate', async (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { title: 'Login', user: req.session.user });
+    res.render('login', { title: 'Login', user: req.session.user, csrfToken: res.locals.csrfToken });
 });
 
 app.post('/login', async (req, res) => {
@@ -98,7 +99,9 @@ app.post('/login', async (req, res) => {
         const user = await db('users').where({ email: email }).first();
         if (user && await bcrypt.compare(password, user.password)) {
             req.session.user = user;
-            res.redirect('/');
+            const redirectUrl = req.session.returnTo || '/';
+            delete req.session.returnTo;
+            res.redirect(redirectUrl);
         } else {
             res.render('login', { title: 'Login', user: req.session.user, error: 'Invalid credentials' });
         }
@@ -133,7 +136,9 @@ app.post('/signup', async (req, res) => {
         // Auto-login after signup
         const newUser = await db('users').where({ email: email }).first();
         req.session.user = newUser;
-        res.redirect('/');
+        const redirectUrl = req.session.returnTo || '/';
+        delete req.session.returnTo;
+        res.redirect(redirectUrl);
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -790,6 +795,67 @@ app.post('/grants/delete/:id', checkManager, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Error deleting grant');
+    }
+});
+
+// Enrollments Management
+app.get('/enroll', checkAuth, async (req, res) => {
+    try {
+        const enrollments = await db('enrollments').select('*').orderBy('submissiondate', 'desc');
+        res.render('enroll', {
+            title: 'Enroll',
+            user: req.session.user,
+            enrollments: enrollments,
+            csrfToken: res.locals.csrfToken
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error retrieving enrollments');
+    }
+});
+
+app.post('/enroll/add', async (req, res) => {
+    const {
+        parentguardianname, phone, email, participantname, participantdob,
+        grade, school, programinterest, mariachiinstrument, instrumentexperience,
+        feestatus, tuitionagreement, languagepreference, medicalconsent,
+        photoconsent, liabilityrelease, parentsignature
+    } = req.body;
+
+    try {
+        await db('enrollments').insert({
+            parentguardianname, phone, email, participantname, participantdob,
+            grade, school,
+            programinterest: Array.isArray(programinterest) ? programinterest.join(', ') : programinterest,
+            mariachiinstrument, instrumentexperience,
+            feestatus,
+            tuitionagreement: tuitionagreement === 'on',
+            languagepreference,
+            medicalconsent: medicalconsent === 'on',
+            photoconsent: photoconsent === 'on',
+            liabilityrelease: liabilityrelease === 'on',
+            parentsignature
+        });
+        res.render('enroll', {
+            title: 'Enroll',
+            user: req.session.user,
+            enrollments: [], // Only managers see the list, so empty for public submission
+            csrfToken: res.locals.csrfToken,
+            success: true
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error adding enrollment');
+    }
+});
+
+app.post('/enroll/delete/:id', checkManager, async (req, res) => {
+    try {
+        await db('enrollments').where('enrollmentid', req.params.id).del();
+        res.redirect('/enroll');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error deleting enrollment');
     }
 });
 
