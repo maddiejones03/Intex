@@ -247,35 +247,7 @@ app.post('/participants/delete/:id', checkManager, async (req, res) => {
     }
 });
 
-// Events Routes
-app.get('/events', checkAuth, async (req, res) => {
-    const { search } = req.query;
-    try {
-        // Fetch Occurrences
-        let occurrencesQuery = db("event_occurrences as eo")
-            .join("event_templates as et", "eo.eventtemplateid", "et.eventtemplateid")
-            .select(
-                "eo.*",
-                "et.eventname",
-                "et.eventtype",
-                "et.eventdescription"
-            );
-
-        if (search) {
-            occurrencesQuery = occurrencesQuery.where('et.eventname', 'ilike', `%${search}%`)
-                .orWhere('et.eventtype', 'ilike', `%${search}%`);
-        }
-        const occurrences = await occurrencesQuery;
-
-        // Fetch Templates (for management and dropdown)
-        const templates = await db('event_templates').select('*').orderBy('eventname');
-
-        res.render('events', { title: 'Events', occurrences, templates, user: req.session.user, search });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error');
-    }
-});
+// Events Routes (Moved to line 728)
 
 // Template Routes
 app.post('/events/templates/add', checkManager, async (req, res) => {
@@ -598,8 +570,15 @@ app.get('/donations', checkAuth, async (req, res) => {
             .select('donations.*', 'participants.participantfirstname', 'participants.participantlastname');
 
         if (search) {
-            query = query.where('participants.participantfirstname', 'ilike', `%${search}%`)
-                .orWhere('participants.participantlastname', 'ilike', `%${search}%`);
+            query = query.where(function () {
+                this.where('participants.participantfirstname', 'ilike', `%${search}%`)
+                    .orWhere('participants.participantlastname', 'ilike', `%${search}%`);
+            });
+        }
+
+        // Filter by user if not Manager
+        if (req.session.user.role !== 'Manager') {
+            query = query.where('participants.userid', req.session.user.userid);
         }
         const donations = await query;
         const participants = await db('participants').select('participantid', 'participantfirstname', 'participantlastname');
@@ -714,6 +693,78 @@ app.post('/organizations/delete/:id', checkManager, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Error deleting organization');
+    }
+});
+
+// Events Routes
+app.get('/events', checkAuth, async (req, res) => {
+    try {
+        const events = await db('event_occurrences')
+            .join('event_templates', 'event_occurrences.eventtemplateid', 'event_templates.eventtemplateid')
+            .select(
+                'event_occurrences.eventoccurrenceid',
+                'event_templates.eventname',
+                'event_templates.eventdescription',
+                'event_occurrences.eventdatetimestart',
+                'event_occurrences.eventdatetimeend',
+                'event_occurrences.eventlocation'
+            )
+            .orderBy('event_occurrences.eventdatetimestart', 'asc');
+
+        console.log('Events found:', events.length);
+
+        // Check if user is a participant
+        const participant = await db('participants').where({ userid: req.session.user.userid }).first();
+
+        // Get existing registrations for this participant
+        let registeredEventIds = [];
+        if (participant) {
+            const registrations = await db('registrations').where({ participantid: participant.participantid }).select('eventoccurrenceid');
+            registeredEventIds = registrations.map(r => r.eventoccurrenceid);
+        }
+
+        res.render('events', {
+            title: 'Available Events',
+            user: req.session.user,
+            events,
+            participant,
+            registeredEventIds,
+            csrfToken: res.locals.csrfToken
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error retrieving events');
+    }
+});
+
+app.post('/events/register/:id', checkAuth, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const participant = await db('participants').where({ userid: req.session.user.userid }).first();
+
+        if (!participant) {
+            return res.redirect('/register');
+        }
+
+        // Check if already registered
+        const existing = await db('registrations').where({
+            participantid: participant.participantid,
+            eventoccurrenceid: id
+        }).first();
+
+        if (!existing) {
+            await db('registrations').insert({
+                participantid: participant.participantid,
+                eventoccurrenceid: id,
+                registrationstatus: 'Registered',
+                registrationcreatedat: new Date()
+            });
+        }
+
+        res.redirect('/events');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error registering for event');
     }
 });
 
