@@ -115,9 +115,13 @@
                             style="width: 100%; text-align: left; padding: 1rem 1.5rem; border: none; display: flex; align-items: center; gap: 0.8rem; cursor: pointer; transition: all 0.2s ease; font-size: 1rem;">
                             Participants Dashboard
                         </button>
-                        <button onclick="showDashboard('donations')" id="tab-donations" class="dashboard-tab"
+                        <button onclick="showDashboard('milestones')" id="tab-milestones" class="dashboard-tab"
                             style="width: 100%; text-align: left; padding: 1rem 1.5rem; border: none; display: flex; align-items: center; gap: 0.8rem; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; background-color: transparent; color: var(--text-secondary);">
-                            Donation / Grant Dashboard
+                            Milestones
+                        </button>
+                        <button onclick="showDashboard('grants')" id="tab-grants" class="dashboard-tab"
+                            style="width: 100%; text-align: left; padding: 1rem 1.5rem; border: none; display: flex; align-items: center; gap: 0.8rem; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; background-color: transparent; color: var(--text-secondary);">
+                            Grants Dashboard
                         </button>
                     </div>
 
@@ -127,49 +131,81 @@
                         <div id="dashboard-participants" class="dashboard-view">
                             <div class="card"
                                 style="background-color: rgba(255, 255, 255, 0.6); padding: 1rem; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.5);">
-                                <div class='tableauPlaceholder' id='viz1764722403598' style='position: relative'>
-                                    <noscript><a href='#'><img alt='Dashboard 1 '
-                                                src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;Dashboard1&#47;1_rss.png'
+                                <div class='tableauPlaceholder' id='viz1764872113140' style='position: relative'>
+                                    <noscript><a href='#'><img alt='Participant Metrics Dashboard '
+                                                src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;ParticipantMetricsDashboard&#47;1_rss.png'
                                                 style='border: none' /></a></noscript><object class='tableauViz'
                                         style='display:none;'>
                                         <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
                                         <param name='embed_code_version' value='3' />
                                         <param name='site_root' value='' />
-                                        <param name='name' value='INTEXTableau&#47;Dashboard1' />
+                                        <param name='name' value='INTEXTableau&#47;ParticipantMetricsDashboard' />
                                         <param name='tabs' value='no' />
                                         <param name='toolbar' value='yes' />
                                         <param name='static_image'
-                                            value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;Dashboard1&#47;1.png' />
+                                            value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;ParticipantMetricsDashboard&#47;1.png' />
                                         <param name='animate_transition' value='yes' />
                                         <param name='display_static_image' value='yes' />
                                         <param name='display_spinner' value='yes' />
                                         <param name='display_overlay' value='yes' />
                                         <param name='display_count' value='yes' />
                                         <param name='language' value='en-US' />
+                                        <param name='filter' value='publish=yes' />
                                     </object>
                                 </div>
                                 <script
-                                    type='text/javascript'>                    var divElement = document.getElementById('viz1764722403598'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '827px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                                    type='text/javascript'>                    var divElement = document.getElementById('viz1764872113140'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '930px'; vizElement.style.height = '671px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '930px'; vizElement.style.height = '671px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '1077px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
                             </div>
                         </div>
 
-                        <!-- Donations Dashboard -->
-                        <div id="dashboard-donations" class="dashboard-view" style="display: none;">
+                        <!-- Milestones Dashboard -->
+                        <div id="dashboard-milestones" class="dashboard-view" style="display: none;">
                             <div class="card"
                                 style="background-color: rgba(255, 255, 255, 0.6); padding: 1rem; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.5);">
-                                <div class='tableauPlaceholder' id='viz1764807539267' style='position: relative'>
-                                    <noscript><a href='#'><img alt='KPI Dashboard '
-                                                src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;KPIDashboard&#47;1_rss.png'
+                                <div class='tableauPlaceholder' id='viz1764871303951' style='position: relative'>
+                                    <noscript><a href='#'><img alt='KPI  Grad&#47;Jobs Dashboard '
+                                                src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;KPIGradJobsDashboard&#47;1_rss.png'
                                                 style='border: none' /></a></noscript><object class='tableauViz'
                                         style='display:none;'>
                                         <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
                                         <param name='embed_code_version' value='3' />
                                         <param name='site_root' value='' />
-                                        <param name='name' value='INTEXTableau&#47;KPIDashboard' />
+                                        <param name='name' value='INTEXTableau&#47;KPIGradJobsDashboard' />
                                         <param name='tabs' value='no' />
                                         <param name='toolbar' value='yes' />
                                         <param name='static_image'
-                                            value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;KPIDashboard&#47;1.png' />
+                                            value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;KPIGradJobsDashboard&#47;1.png' />
+                                        <param name='animate_transition' value='yes' />
+                                        <param name='display_static_image' value='yes' />
+                                        <param name='display_spinner' value='yes' />
+                                        <param name='display_overlay' value='yes' />
+                                        <param name='display_count' value='yes' />
+                                        <param name='language' value='en-US' />
+                                        <param name='filter' value='publish=yes' />
+                                    </object>
+                                </div>
+                                <script
+                                    type='text/javascript'>                    var divElement = document.getElementById('viz1764871303951'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '930px'; vizElement.style.height = '671px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '930px'; vizElement.style.height = '671px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '777px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                            </div>
+                        </div>
+
+                        <!-- Grants Dashboard -->
+                        <div id="dashboard-grants" class="dashboard-view" style="display: none;">
+                            <div class="card"
+                                style="background-color: rgba(255, 255, 255, 0.6); padding: 1rem; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.5); width: 954px; height: 698px;">
+                                <div class='tableauPlaceholder' id='viz1764872728669' style='position: relative'>
+                                    <noscript><a href='#'><img alt='KPI Grants Dashboard '
+                                                src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;KPIGrantsDashboard&#47;1_rss.png'
+                                                style='border: none' /></a></noscript><object class='tableauViz'
+                                        style='display:none;'>
+                                        <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                                        <param name='embed_code_version' value='3' />
+                                        <param name='site_root' value='' />
+                                        <param name='name' value='INTEXTableau&#47;KPIGrantsDashboard' />
+                                        <param name='tabs' value='no' />
+                                        <param name='toolbar' value='yes' />
+                                        <param name='static_image'
+                                            value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;IN&#47;INTEXTableau&#47;KPIGrantsDashboard&#47;1.png' />
                                         <param name='animate_transition' value='yes' />
                                         <param name='display_static_image' value='yes' />
                                         <param name='display_spinner' value='yes' />
@@ -179,12 +215,14 @@
                                         <param name='filter' value='publish=yes' />
                                     </object></div>
                                 <script
-                                    type='text/javascript'>                    var divElement = document.getElementById('viz1764807539267'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '977px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                                    type='text/javascript'>                    var divElement = document.getElementById('viz1764872728669'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '930px'; vizElement.style.height = '671px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '930px'; vizElement.style.height = '671px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '1177px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+
 
             <script>
                 const ctx = document.getElementById('impactChart').getContext('2d');
@@ -245,10 +283,14 @@
                             el.style.fontWeight = '400';
                         }
                     });
+
+
                 }
 
                 // Initialize first tab
                 showDashboard('participants');
+
+
             </script>
 
             <%- include('partials/footer') %>
