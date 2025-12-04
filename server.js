@@ -74,7 +74,6 @@ const checkAuth = (req, res, next) => {
         next();
     } else {
         req.session.returnTo = req.originalUrl;
-        console.log(`checkAuth: Redirecting to login. returnTo set to: ${req.session.returnTo}`);
         req.session.save((err) => {
             if (err) console.error("Session save error:", err);
             res.redirect('/login');
@@ -841,8 +840,6 @@ app.get('/events', checkAuth, async (req, res) => {
 
         // Fetch distinct event types for filter
         const eventTypes = await db('event_templates').distinct('eventtype').pluck('eventtype');
-
-        console.log('Events found:', events.length);
 
         // Check if user is a participant
         const participant = await db('participants').where({ userid: req.session.user.userid }).first();
