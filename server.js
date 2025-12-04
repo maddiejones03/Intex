@@ -675,7 +675,8 @@ app.get('/donations', checkAuth, async (req, res) => {
     try {
         let query = db('donations')
             .leftJoin('participants', 'donations.participantid', 'participants.participantid')
-            .select('donations.*', 'participants.participantfirstname', 'participants.participantlastname');
+            .select('donations.*', 'participants.participantfirstname', 'participants.participantlastname')
+            .orderBy('donationdate', 'desc');
 
         if (search) {
             query = query.where(function () {

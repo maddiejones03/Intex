@@ -5,9 +5,6 @@
             <div class="container section" style="margin-top: 4rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h1>Milestones</h1>
-                    <% if (user && user.role==='Manager' ) { %>
-                        <button onclick="openModal()" class="btn btn-primary">Add Milestone</button>
-                        <% } %>
                 </div>
 
                 <!-- Search Form -->
@@ -67,9 +64,6 @@
                                     <% if (user && user.role==='Manager' ) { %>
                                         <td>
                                             <div style="display: flex; gap: 0.5rem;">
-                                                <button onclick="openEditModal('<%= m.milestoneid %>')"
-                                                    class="btn btn-outline"
-                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px;">Edit</button>
                                                 <form action="/milestones/delete/<%= m.milestoneid %>" method="POST"
                                                     onsubmit="return confirm('Are you sure?');"
                                                     style="display: inline;">
