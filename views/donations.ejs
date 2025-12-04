@@ -5,9 +5,6 @@
             <div class="container section" style="margin-top: 4rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h1>Donations</h1>
-                    <% if (user && user.role==='Manager' ) { %>
-                        <button onclick="openModal()" class="btn btn-primary">Add Donation</button>
-                        <% } %>
                 </div>
 
                 <!-- Search Form -->
@@ -39,9 +36,6 @@
                                 <th>Donor</th>
                                 <th>Amount</th>
                                 <th>Date</th>
-                                <% if (user && user.role==='Manager' ) { %>
-                                    <th>Actions</th>
-                                    <% } %>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,27 +52,12 @@
                                                         <em>Anonymous/Unlinked</em>
                                                         <% } %>
                                     </td>
-                                    <td>$<%= d.donationamount %>
+                                    <td>
+                                        <%= d.donationamount %>
                                     </td>
                                     <td>
-                                        <%= new Date(d.donationdate).toLocaleDateString() %>
+                                        <%= d.donationdate %>
                                     </td>
-                                    <% if (user && user.role==='Manager' ) { %>
-                                        <td>
-                                            <div style="display: flex; gap: 0.5rem;">
-                                                <button onclick="openEditModal('<%= d.donationid %>')"
-                                                    class="btn btn-outline"
-                                                    style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 20px;">Edit</button>
-                                                <form action="/donations/delete/<%= d.donationid %>" method="POST"
-                                                    onsubmit="return confirm('Are you sure?');"
-                                                    style="display: inline;">
-                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                                    <button type="submit" class="btn btn-primary"
-                                                        style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background-color: #ff4444; border-color: #ff4444; border-radius: 20px;">Delete</button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                        <% } %>
                                 </tr>
                                 <% }) %>
                         </tbody>
@@ -86,124 +65,6 @@
                 </div>
             </div>
 
-            <!-- Add Donation Modal -->
-            <div id="addDonationModal" class="modal"
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-                <div class="form-container"
-                    style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
-                    <span onclick="document.getElementById('addDonationModal').style.display='none'"
-                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                    <h2 style="text-align: center; margin-bottom: 2rem;">Add Donation</h2>
-                    <form action="/donations/add" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <div class="form-group">
-                            <label>Participant</label>
-                            <select name="participantid" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                                <option value="">-- Select Participant (Optional) --</option>
-                                <% participants.forEach(p=> { %>
-                                    <option value="<%= p.participantid %>">
-                                        <%= p.participantfirstname %>
-                                            <%= p.participantlastname %>
-                                    </option>
-                                    <% }); %>
-                            </select>
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Date</label>
-                            <input type="date" name="donationdate" required
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Amount</label>
-                            <input type="number" step="0.01" name="donationamount" required
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Type</label>
-                            <input type="text" name="donationtype"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Notes</label>
-                            <textarea name="donationnotes" rows="3"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Add
-                            Donation</button>
-                    </form>
-                </div>
-            </div>
 
-            <!-- Edit Donation Modal -->
-            <div id="editDonationModal" class="modal"
-                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto;">
-                <div class="form-container"
-                    style="margin: 5vh auto; position: relative; background: white; padding: 2rem; border-radius: 8px; max-width: 600px;">
-                    <span onclick="document.getElementById('editDonationModal').style.display='none'"
-                        style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem;">&times;</span>
-                    <h2 style="text-align: center; margin-bottom: 2rem;">Edit Donation</h2>
-                    <form id="editDonationForm" action="" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <div class="form-group">
-                            <label>Participant</label>
-                            <select id="edit_participantid" name="participantid"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                                <option value="">-- Select Participant (Optional) --</option>
-                                <% participants.forEach(p=> { %>
-                                    <option value="<%= p.participantid %>">
-                                        <%= p.participantfirstname %>
-                                            <%= p.participantlastname %>
-                                    </option>
-                                    <% }); %>
-                            </select>
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Date</label>
-                            <input type="date" id="edit_donationdate" name="donationdate" required
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Amount</label>
-                            <input type="number" step="0.01" id="edit_donationamount" name="donationamount" required
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Type</label>
-                            <input type="text" id="edit_donationtype" name="donationtype"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
-                        </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Notes</label>
-                            <textarea id="edit_donationnotes" name="donationnotes" rows="3"
-                                style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Update
-                            Donation</button>
-                    </form>
-                </div>
-            </div>
-
-            <script>
-                function editDonation(id) {
-                    const d = donationsData.find(d => d.donationid == id);
-                    if (!d) return;
-
-                    document.getElementById('donationModal').style.display = 'block';
-                    document.getElementById('modalTitle').innerText = 'Edit Donation';
-                    document.getElementById('donationForm').action = `/donations/edit/${d.donationid}`;
-
-                    const form = document.getElementById('donationForm');
-                    form.participantid.value = d.participantid || '';
-                    form.donationamount.value = d.donationamount;
-                    form.donationdate.value = d.donationdate ? d.donationdate.split('T')[0] : '';
-                }
-
-                // Close modal if clicked outside
-                window.onclick = function (event) {
-                    if (event.target == document.getElementById('donationModal')) {
-                        closeModal();
-                    }
-                }
-            </script>
 
             <%- include('partials/footer') %>
