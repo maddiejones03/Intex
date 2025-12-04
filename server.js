@@ -806,18 +806,36 @@ app.post('/organizations/delete/:id', checkManager, async (req, res) => {
 
 // Events Routes
 app.get('/events', checkAuth, async (req, res) => {
+    const { search, type } = req.query;
     try {
-        const events = await db('event_occurrences')
+        let query = db('event_occurrences')
             .join('event_templates', 'event_occurrences.eventtemplateid', 'event_templates.eventtemplateid')
             .select(
                 'event_occurrences.eventoccurrenceid',
                 'event_templates.eventname',
                 'event_templates.eventdescription',
+                'event_templates.eventtype',
                 'event_occurrences.eventdatetimestart',
                 'event_occurrences.eventdatetimeend',
                 'event_occurrences.eventlocation'
             )
             .orderBy('event_occurrences.eventdatetimestart', 'desc');
+
+        if (search) {
+            query = query.where(function () {
+                this.where('event_templates.eventname', 'ilike', `%${search}%`)
+                    .orWhere('event_templates.eventdescription', 'ilike', `%${search}%`);
+            });
+        }
+
+        if (type) {
+            query = query.where('event_templates.eventtype', 'ilike', `%${type}%`);
+        }
+
+        const events = await query;
+
+        // Fetch distinct event types for filter
+        const eventTypes = await db('event_templates').distinct('eventtype').pluck('eventtype');
 
         console.log('Events found:', events.length);
 
@@ -837,6 +855,9 @@ app.get('/events', checkAuth, async (req, res) => {
             events,
             participant,
             registeredEventIds,
+            eventTypes,
+            search,
+            type,
             csrfToken: res.locals.csrfToken
         });
     } catch (err) {

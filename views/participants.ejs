@@ -1,12 +1,13 @@
 <%- include('partials/header') %>
     <%- include('partials/nav') %>
-        <%- include('partials/aesthetic-bg') %>
+        <%- include('partials/aesthetic-bg-cool') %>
 
             <div class="container section" style="margin-top: 4rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h1>Participants</h1>
                     <% if (user && user.role==='Manager' ) { %>
-                        <button onclick="openAddModal()" class="btn btn-primary">Add Participant</button>
+                        <button onclick="openAddModal()" class="btn btn-outline"
+                            style="padding: 1rem 1rem; font-size: 0.8rem;">Add Participant</button>
                         <% } %>
                 </div>
 
