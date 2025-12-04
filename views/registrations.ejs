@@ -5,47 +5,58 @@
             <h1>Event Registrations</h1>
 
             <!-- Search Form -->
-            <form action="/registrations" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" placeholder="Search by participant or event..."
-                    value="<%= typeof search !== 'undefined' ? search : '' %>" style="flex: 1;">
-                <button type="submit" class="btn btn-outline">Search</button>
+            <form action="/registrations" method="GET" style="margin-bottom: 2rem;">
+                <div class="aesthetic-search">
+                    <input type="text" name="search" placeholder="Search by participant or event..."
+                        value="<%= typeof search !== 'undefined' ? search : '' %>">
+                    <button type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </button>
+                </div>
                 <% if (typeof search !=='undefined' && search) { %>
-                    <a href="/registrations" class="btn btn-outline">Clear</a>
+                    <div style="margin-top: 1rem;">
+                        <a href="/registrations" class="btn btn-outline"
+                            style="padding: 0.5rem 1rem; text-decoration: none; border-radius: 50px;">Clear Search</a>
+                    </div>
                     <% } %>
             </form>
 
-            <div class="card">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div class="card" style="padding: 0; overflow: hidden; border: none; background: transparent;">
+                <table class="aesthetic-table">
                     <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid #eee;">
-                            <th style="padding: 1rem;">ID</th>
-                            <th style="padding: 1rem;">Participant</th>
-                            <th style="padding: 1rem;">Event</th>
-                            <th style="padding: 1rem;">Date</th>
-                            <th style="padding: 1rem;">Status</th>
-                            <th style="padding: 1rem;">Registered On</th>
+                        <tr>
+                            <th>ID</th>
+                            <th>Participant</th>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Registered On</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% registrations.forEach(r=> { %>
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 1rem;">
+                            <tr>
+                                <td>
                                     <%= r.registrationid %>
                                 </td>
-                                <td style="padding: 1rem;">
+                                <td>
                                     <%= r.participantfirstname %>
                                         <%= r.participantlastname %>
                                 </td>
-                                <td style="padding: 1rem;">
+                                <td>
                                     <%= r.eventname %>
                                 </td>
-                                <td style="padding: 1rem;">
+                                <td>
                                     <%= new Date(r.eventdatetimestart).toLocaleString() %>
                                 </td>
-                                <td style="padding: 1rem;">
+                                <td>
                                     <%= r.registrationstatus %>
                                 </td>
-                                <td style="padding: 1rem;">
+                                <td>
                                     <%= new Date(r.registrationcreatedat).toLocaleDateString() %>
                                 </td>
                             </tr>
