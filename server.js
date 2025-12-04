@@ -74,7 +74,11 @@ const checkAuth = (req, res, next) => {
         next();
     } else {
         req.session.returnTo = req.originalUrl;
-        res.redirect('/login');
+        console.log(`checkAuth: Redirecting to login. returnTo set to: ${req.session.returnTo}`);
+        req.session.save((err) => {
+            if (err) console.error("Session save error:", err);
+            res.redirect('/login');
+        });
     }
 };
 
